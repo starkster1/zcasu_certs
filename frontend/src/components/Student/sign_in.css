@@ -1,0 +1,52 @@
+/* SignIn.css */
+.sign-in-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+  }
+  
+  .sign-in-box {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sign-in-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .sign-in-input {
+    margin-bottom: 20px;
+  }
+  
+  .sign-in-button {
+    margin-top: 20px;
+    background-color: #6a11cb;
+    font-size: 1rem;
+  }
+  
+  .sign-in-button:hover {
+    background-color: #2575fc;
+  }
+  
+  .metamask-button {
+    margin-top: 20px;
+    background-color: #f6851b;
+  }
+  
+  .metamask-button:hover {
+    background-color: #f6871d;
+  }
+  
+  .sign-in-alert {
+    margin-top: 20px;
+  }
+  
