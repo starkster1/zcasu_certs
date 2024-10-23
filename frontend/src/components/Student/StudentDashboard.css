@@ -1,274 +1,141 @@
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+/* Sidebar */
+.sidebar {
+  background-color: #1f2937; /* Dark grey color */
+  color: white;
+  padding: 2rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-btn {
+  background-color: transparent;
+  color: white;
+  text-align: left;
+}
+
+.sidebar-btn:hover {
+  background-color: #374151; /* Lighter grey on hover */
+}
+
+/* Sidebar Title */
+.dashboard-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Toggle Sidebar Button */
+.toggle-sidebar-btn {
+  padding: 0.5rem;
+  background-color: transparent;
+  color: white;
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: #374151;
 }
 
 /* Header */
-.dashboard-header {
+.header {
+  background-color: white;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
-  padding: 20px;
-  background-color: #6a4dd4;
-  color: white;
   align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-}
-
-.logo-circle {
-  width: 40px;
-  height: 40px;
-  background-color: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 10px;
-}
-
-.logo-icon {
-  font-size: 1.5rem;
-  color: #6a4dd4;
-}
-
-.logo-title {
-  font-size: 1.5rem;
-}
-
-.search-container {
+.search-bar {
   position: relative;
 }
 
 .search-input {
-  padding: 8px;
-  border-radius: 20px;
-  border: none;
-  outline: none;
+  padding-left: 2.5rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 9999px;
 }
 
 .search-icon {
   position: absolute;
-  right: 10px;
+  left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #6a4dd4;
+  color: #6b7280; /* Gray color */
 }
 
-.notification-container {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  color: white;
-}
-
-.icon-container {
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-/* Body */
-.dashboard-body {
-  display: flex;
-  flex: 1;
-}
-
-.sidebar {
-  width: 20%;
-  background-color: #f7f7f7;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 1px solid #e0e0e0;
-}
-
-.profile-section {
-  text-align: center;
-}
-
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 40%;
-  margin-top: -20px;
-  margin-bottom: 10px;
-}
-
-.profile-name {
-  font-weight: bold;
-  margin-top: -5px;
+/* Profile Button */
+.profile-btn {
+  padding: 0.5rem;
+  background-color: transparent;
   color: black;
 }
 
-.profile-email {
-  font-size: 0.9em;
-  color: #888;
-  margin-top: -5px;
+.profile-btn:hover {
+  background-color: #f3f4f6; /* Light grey hover */
 }
 
-.profile-btn {
-  background-color: #6a4dd4;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  margin-top: 10px;
+/* Dashboard Content */
+.dashboard-heading {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
 }
 
-.nav-menu ul {
-  list-style: none;
-  padding: 0;
+/* Dashboard Sections */
+.dashboard-section {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-.nav-menu li {
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+.dashboard-section:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.nav-menu li i {
-  margin-right: 10px;
-}
-
-.nav-menu li.active {
-  background-color: #6a4dd4;
-  color: white;
-  border-radius: 5px;
-  padding-left: 10px;
-}
-
-.nav-menu li.active i {
-  color: white;
-}
-
-.nav-menu li:hover {
-  background-color: #e0e0e0;
-  border-radius: 5px;
-  padding-left: 10px;
-}
-
-.main-content {
-  flex: 1;
-  padding: 20px;
-  width: 100%;         /* Ensure it uses 100% of the available width */
-  max-width: 1200px;    /* Optional: Limit maximum width to avoid being too wide */
-  margin: 0 auto;       /* Center the content horizontally if the max-width is smaller than the viewport */
-  overflow-y: auto;     /* Allows scrolling if content overflows */
-}
-
-
-.documents-section, .notifications-box {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  color: rgb(88, 87, 87);
-}
-
+/* Section Title */
 .section-title {
   font-size: 1.5rem;
-  margin-bottom: 10px;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
-.section-subtitle {
-  font-size: 0.9rem;
-  color: #8a8787;
+/* Section Text */
+.section-text {
+  color: #6b7280; /* Gray color for text */
+  margin-bottom: 1.5rem;
 }
 
-.document-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f7f7f7;
-  padding: 15px;
-  margin-top: 20px;
-  border-radius: 8px;
-  width: 100%;
-  flex-wrap: wrap;
-}
-
-.document-card > * {
-  flex: 1; /* Allow child elements to expand equally */
-  min-width: 150px; /* Ensure minimum width for content items */
-  margin: 0 10px; /* Add space between content items */
-}
-
-
-.doc-info {
-  display: flex;
-  align-items: center;
-}
-
-.doc-icon {
-  font-size: 1.5rem;
-  margin-right: 10px;
-}
-
-.view-btn {
-  background-color: #28a745;
+/* Button - Verify Certificate */
+.verify-btn {
+  background-color: #3b82f6; /* Blue color */
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
 }
 
-.add-doc-btn {
-  background-color: #c4c0d1;
-  color: white;
-  padding: 15px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 20px;
-  border: none;
+.verify-btn:hover {
+  background-color: #2563eb; /* Darker blue on hover */
 }
 
-/* Notifications */
-.notifications {
-  width: 20%;
-  padding: 20px;
+/* Section List */
+.section-list {
+  list-style: none;
+  padding-left: 0;
 }
 
-.notifications-box {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  color: white;
- 
+.section-list li {
+  margin-bottom: 0.75rem;
 }
 
-.notifications-title {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  color: black;
+/* Quick Link */
+.quick-link {
+  color: #3b82f6;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .dashboard-body {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 80%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .main-content {
-    padding: 15px;
-  }
-
-  .notifications {
-    width: 100%;
-    margin-top: 20px;
-  }
+.quick-link:hover {
+  text-decoration: underline;
 }

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, TextField, Button, Typography, IconButton, InputAdornment, Alert } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FaEthereum } from 'react-icons/fa';
-import './sign_in.css';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Container, TextField, Button, Typography, IconButton, InputAdornment, Alert, Checkbox, FormControlLabel } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import './sign_in.css';  // External CSS for styling
 
 // MetaMask connection logic
 export const connectToMetaMask = async () => {
@@ -33,13 +33,15 @@ export const connectToMetaMask = async () => {
 };
 
 const SignIn = ({ setUserProfile }) => {
+  const [emailOrStudentNumber, setEmailOrStudentNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [ethAddress, setEthAddress] = useState('');
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [emailOrStudentNumber, setEmailOrStudentNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -57,7 +59,17 @@ const SignIn = ({ setUserProfile }) => {
         setIsMetamaskConnected(true);
       }
 
-      // Send login request to the server
+      // Validate form fields
+      if (!emailOrStudentNumber || !password) {
+        setErrors({
+          emailOrStudentNumber: !emailOrStudentNumber ? 'Email or Student Number is required' : '',
+          password: !password ? 'Password is required' : '',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Simulate login (replace with actual API request)
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
@@ -67,32 +79,23 @@ const SignIn = ({ setUserProfile }) => {
           emailOrStudentNumber,
           password,
           ethAddress: currentAddress,
+          rememberMe,
         }),
       });
 
       const data = await response.json();
-      console.log('Login response:', data);  // Check response data
-
       if (response.ok) {
-        // Check if role exists in data.user
-        if (data.user && data.user.role) {
-          console.log('Role:', data.user.role);
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('userRole', data.user.role);  // Save role in localStorage
-          setUserProfile(data.user);  // Set user profile correctly
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userRole', data.user.role);  // Save role in localStorage
+        setUserProfile(data.user);
 
-          // Navigate to the respective dashboard based on role
-          if (data.user.role === 'admin') {
-            navigate('/admin/dashboard');
-          } else if (data.user.role === 'student') {
-            navigate('/dashboard');
-          } else {
-            console.error('Invalid role detected:', data.user.role);
-            setErrorMessage('Invalid role. Please try again.');
-          }
+        // Navigate to the correct dashboard
+        if (data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (data.user.role === 'student') {
+          navigate('/dashboard');
         } else {
-          console.error('Role not found in the response data.');
-          setErrorMessage('Role not found. Please contact support.');
+          setErrorMessage('Invalid role detected. Please try again.');
         }
       } else {
         setErrorMessage(data.message || 'Login failed. Please try again.');
@@ -104,64 +107,109 @@ const SignIn = ({ setUserProfile }) => {
     }
   };
 
+  // Handle navigation to Sign Up page
+  const goToSignUp = () => {
+    navigate('/signup');  // Navigate to the Sign Up page
+  };
+
   return (
-    <Container className="sign-in-container">
-      <div className="sign-in-box">
-        <Typography variant="h4" className="sign-in-title">
-          Login
-        </Typography>
+    <Container className="login-container">
+      <div className="login-box">
 
-        {/* Email or Student Number Input */}
-        <TextField
-          label="Email or Student Number"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={emailOrStudentNumber}
-          onChange={(e) => setEmailOrStudentNumber(e.target.value)}
-          className="sign-in-input"
-        />
+        {/* Left side: Login form */}
+        <div className="login-form-container">
+          <Typography variant="h4" className="login-title">Welcome Back!</Typography>
+          <form onSubmit={handleLogin}>
 
-        {/* Password Input with Toggle Visibility */}
-        <TextField
-          label="Password"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="sign-in-input"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+            {/* Email or Student Number */}
+            <TextField
+              label="Email or Student Number"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={emailOrStudentNumber}
+              onChange={(e) => setEmailOrStudentNumber(e.target.value)}
+              error={!!errors.emailOrStudentNumber}
+              helperText={errors.emailOrStudentNumber}
+              className="login-input"
+            />
 
-        {/* Error Message Display */}
-        {errorMessage && (
-          <Alert severity="error" className="sign-in-alert">
-            {errorMessage}
-          </Alert>
-        )}
+            {/* Password Input with Toggle Visibility */}
+            <TextField
+              label="Password"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!errors.password}
+              helperText={errors.password}
+              className="login-input"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-        {/* Login Button */}
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleLogin}
-          disabled={isLoading}
-          className="sign-in-button"
-          startIcon={<FaEthereum />}
-        >
-          {isLoading ? 'Connecting...' : 'Login'}
-        </Button>
+            {/* Remember Me & Forgot Password */}
+            <div className="login-options">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="Remember me"
+              />
+              <a href="#" className="forgot-password">Forgot your password?</a>
+            </div>
+
+            {/* Error Message */}
+            {errorMessage && (
+              <Alert severity="error" className="login-alert">
+                {errorMessage}
+              </Alert>
+            )}
+
+            {/* MetaMask Login Button */}
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              type="submit"
+              className="login-button"
+              disabled={isLoading}
+              startIcon={<FaEthereum />}
+            >
+              {isLoading ? 'Connecting...' : 'Login'}
+            </Button>
+          </form>
+
+          {/* Not a member? Sign up now */}
+          <p className="text-center">
+            Not a member? <a href="#" onClick={goToSignUp}>Sign up now</a>
+          </p>
+        </div>
+
+        {/* Right side: Testimonial */}
+        <div className="testimonial-section">
+          <img src="https://via.placeholder.com/80" alt="Testimonial" className="testimonial-image" />
+          <p className="testimonial-text">
+            "This platform has been a game-changer for me. The easy access to resources and the
+            integrated MetaMask login makes it super convenient!"
+          </p>
+          <p className="testimonial-name">Student A</p>
+          <p className="testimonial-position">University Student</p>
+        </div>
+
       </div>
     </Container>
   );

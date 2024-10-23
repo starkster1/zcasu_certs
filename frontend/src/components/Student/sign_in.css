@@ -1,52 +1,149 @@
-/* SignIn.css */
-.sign-in-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-  }
+/* General layout */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+  background-color: #eef3ff;
+}
+
+/* Two-column layout for login and testimonial */
+.login-box {
+  display: flex;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+  width: 1000px;
+  overflow: hidden;
+}
+
+/* Left column: Login form */
+.login-form-container {
+  padding: 1rem;
+  flex: 1;
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 1.5rem;
+}
+
+/* Input fields */
+.login-input {
+  margin-bottom: 1.5rem;
+}
+
+.login-input input {
+  border-radius: 5px;
+}
+
+/* Error message styling */
+.MuiFormHelperText-root {
+  color: red;
+  font-size: 0.9rem;
+}
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+  border-color: red;
+}
+
+/* Remember me and Forgot Password */
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password {
+  color: #2575fc;
+  font-size: 0.9rem;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.remember-me-checkbox {
+  font-size: 0.9rem;
+}
+
+/* Submit button */
+.login-button {
+  background-color: #3e2272;
+  color: white;
+  font-size: 1rem;
+  padding: 0.8rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #3e2272;
+}
+
+/* Sign up link */
+.text-center {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.text-center a {
+  color: #2575fc;
+  text-decoration: none;
+}
+
+.text-center a:hover {
+  text-decoration: underline;
+}
+
+/* Right column: Testimonial */
+.testimonial-section {
+  background-color: #112d65;
+  color: white;
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   
-  .sign-in-box {
-    width: 100%;
-    max-width: 400px;
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .sign-in-title {
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .sign-in-input {
-    margin-bottom: 20px;
-  }
-  
-  .sign-in-button {
-    margin-top: 20px;
-    background-color: #6a11cb;
-    font-size: 1rem;
-  }
-  
-  .sign-in-button:hover {
-    background-color: #2575fc;
-  }
-  
-  .metamask-button {
-    margin-top: 20px;
-    background-color: #f6851b;
-  }
-  
-  .metamask-button:hover {
-    background-color: #f6871d;
-  }
-  
-  .sign-in-alert {
-    margin-top: 20px;
-  }
-  
+}
+
+.testimonial-image {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 3px solid white;
+}
+
+.testimonial-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.testimonial-text {
+  font-size: 1rem;
+  font-style: italic;
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+.testimonial-name {
+  font-weight: bold;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+.testimonial-position {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #b3c7e6;
+}

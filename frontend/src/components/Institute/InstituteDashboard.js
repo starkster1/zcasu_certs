@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // For redirecting users
-import { FaUserGraduate, FaUserShield, FaUserClock, FaExchangeAlt, FaSearch } from 'react-icons/fa';
+import { FaUserGraduate, FaUserShield, FaUserClock, FaExchangeAlt, FaSearch, FaBars, FaCogs } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import './dashboard.css';
+import { FiLogOut, FiAward} from 'react-icons/fi';
 
 const InstituteDashboard = () => {
   const [user, setUser] = useState(null);  // Track the logged-in admin user
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isCollapsed, setIsCollapsed] = useState(false); // State to track if sidebar is collapsed
   const navigate = useNavigate();
 
   useEffect(() => {
+    
     const fetchAdminData = async () => {
       const token = localStorage.getItem('authToken');  // Get JWT token from localStorage
       if (!token) {
@@ -50,19 +53,40 @@ const InstituteDashboard = () => {
   
     fetchAdminData();
   }, [navigate]);
-  
+
+  // Resize effect to handle collapsing the sidebar on smaller screens
+  useEffect(() => {
+    const handleResize = () => {
+      setIsCollapsed(window.innerWidth < 768); // Collapse if screen width is less than 768px
+    };
+
+    window.addEventListener("resize", handleResize);  // Add event listener for resize
+    handleResize();  // Call it on mount to set the initial state
+
+    return () => window.removeEventListener("resize", handleResize);  // Cleanup the event listener
+  }, []);
+
+   // Logout logic
+   const handleLogout = () => {
+    localStorage.removeItem('authToken');  // Clear JWT token
+    localStorage.removeItem('userRole');   // Clear user role (if stored)
+    navigate('/signin');  // Redirect to sign-in page
+  };
+
   // If no user is set, show a loading screen
   if (!user) {
     return <div>Loading admin dashboard...</div>;
   }
 
-
   const sidebarItems = [
     { id: 'dashboard', icon: <MdDashboard />, label: 'Dashboard' },
+    { id: 'Accreditation', icon: <FiAward />, label: 'Accreditation'},
     { id: 'linkedAccounts', icon: <FaUserGraduate />, label: 'Linked Accounts' },
     { id: 'accessRights', icon: <FaUserShield />, label: 'Access Rights' },
     { id: 'pendingApprovals', icon: <FaUserClock />, label: 'Pending Approvals' },
     { id: 'changeInstitute', icon: <FaExchangeAlt />, label: 'Change Institute' },
+    { id: 'Settings', icon: <FaCogs />, label: 'Settings'},
+    { id: 'Logout', icon: <FiLogOut/>, label: 'Logout', action: handleLogout },
   ];
 
   const dummyStudents = [
@@ -89,22 +113,30 @@ const InstituteDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-800">
       {/* Sidebar */}
-      <aside className="w-64 bg-indigo-700 text-white p-6">
-        <h1 className="text-2xl font-bold mb-8">Institute Dashboard</h1>
-        <nav>
+      <aside className={`bg-gray-800 text-white p-5 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} h-screen`}>
+        <div className="flex items-center justify-between mb-8">
+          {/* Collapse button */}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="collapsible-button"
+          >
+            <FaBars size={24} />
+          </button>
+        </div>
+
+        {/* Sidebar items */}
+        <nav className="overflow-y-auto h-full">
           <ul>
             {sidebarItems.map((item) => (
               <li key={item.id} className="mb-4">
                 <button
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center w-full p-2 rounded transition-colors ${
-                    activeTab === item.id ? 'bg-indigo-800' : 'hover:bg-indigo-600'
-                  }`}
+                  className={`flex items-center w-full p-1 rounded transition-colors ${activeTab === item.id ? 'bg-indigo-800' : 'hover:bg-gray-800'}`}
                 >
-                  <span className="mr-3">{item.icon}</span>
-                  {item.label}
+                  <span className="mr-3 text-2xl">{item.icon}</span>
+                  {!isCollapsed && <span>{item.label}</span>}
                 </button>
               </li>
             ))}
@@ -118,22 +150,26 @@ const InstituteDashboard = () => {
           {renderContent()}
         </div>
       </main>
+      
     </div>
   );
 };
 
-// The rest of the components remain the same...
+
 const Dashboard = () => (
   <div>
     <h2 className="text-3xl font-bold mb-6">Welcome Back!</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <DashboardCard title="Accreditation" value="10" icon={<FiAward />} />
       <DashboardCard title="Linked Accounts" value="150" icon={<FaUserGraduate />} />
       <DashboardCard title="Access Rights" value="120" icon={<FaUserShield />} />
       <DashboardCard title="Pending Approvals" value="15" icon={<FaUserClock />} />
       <DashboardCard title="Change Requests" value="5" icon={<FaExchangeAlt />} />
+      
     </div>
   </div>
 );
+
 const DashboardCard = ({ title, value, icon }) => (
   <div className="bg-white rounded-lg shadow p-6 flex items-center">
     <div className="rounded-full bg-indigo-100 p-3 mr-4">
@@ -156,8 +192,12 @@ const LinkedAccounts = ({ students }) => (
             type="text"
             placeholder="Search students..."
             className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            style={{ height: '20px' }} 
           />
-          <button className="bg-indigo-600 text-white p-2 rounded-r-md hover:bg-indigo-700 transition-colors">
+          <button
+            className="bg-indigo-600 text-white p-2 rounded-r-md hover:bg-indigo-700 transition-colors"
+            style={{ height: '40px' }} 
+          >
             <FaSearch />
           </button>
         </div>
@@ -167,7 +207,7 @@ const LinkedAccounts = ({ students }) => (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -184,8 +224,7 @@ const LinkedAccounts = ({ students }) => (
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="text-indigo-600 hover:text-indigo-900 mr-2">View</button>
-                <button className="text-indigo-600 hover:text-indigo-900">Edit</button>
+                <button className="text-indigo-600 hover:text-indigo-900">View</button>
               </td>
             </tr>
           ))}
@@ -204,7 +243,7 @@ const AccessRights = ({ students }) => (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Access Level</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -227,23 +266,31 @@ const AccessRights = ({ students }) => (
 const PendingApprovals = ({ students }) => (
   <div>
     <h2 className="text-3xl font-bold mb-6">Pending Approvals</h2>
+
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Type</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            {/* Make sure this is aligned to the right */}
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
+
         <tbody className="bg-white divide-y divide-gray-200">
           {students.filter(s => s.status === 'Pending').map((student) => (
             <tr key={student.id}>
               <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">Certificate Approval</td>
+              {/* Ensure buttons are aligned to the right */}
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition-colors">Approve</button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">Reject</button>
+                <button className="bg-green-500 text-black px-3 py-1 rounded mr-2 hover:bg-green-600 transition-colors">
+                  Approve
+                </button>
+                <button className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600 transition-colors">
+                  Reject
+                </button>
               </td>
             </tr>
           ))}
@@ -263,7 +310,7 @@ const ChangeInstitute = ({ students }) => (
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Institute</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested Institute</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -273,8 +320,8 @@ const ChangeInstitute = ({ students }) => (
               <td className="px-6 py-4 whitespace-nowrap">ZCAS University</td>
               <td className="px-6 py-4 whitespace-nowrap">Requested Institute Name</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition-colors">Approve</button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">Reject</button>
+                <button className="bg-green-500 text-black px-3 py-1 rounded mr-2 hover:bg-green-600 transition-colors">Approve</button>
+                <button className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600 transition-colors">Reject</button>
               </td>
             </tr>
           ))}
