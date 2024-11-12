@@ -10,7 +10,7 @@ module.exports = {
       network_id: "*",       // Match any network id
     },
 
-    // Sepolia Test Network
+    // Sepolia Test Networkj
     sepolia: {
       provider: () => new HDWalletProvider(
         process.env.MNEMONIC, // Mnemonic phrase for wallet

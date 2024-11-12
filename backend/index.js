@@ -4,7 +4,7 @@ const cors = require('cors');
 const connectDB = require('./db');  // MongoDB connection
 const profileRoutes = require('./routes/profileRoutes');  // Import profile routes
 const authRoutes = require('./routes/authRoutes');  // Import auth routes
-const uploadRoutes = require('./routes/uploadRoutes'); // Import upload routes
+const upload = require('./routes/upload'); // Import upload routes
 const adminRoutes = require('./routes/adminRoutes');  // Import admin routes
 
 const app = express();
@@ -26,7 +26,7 @@ app.use('/api', profileRoutes); // This makes /api/user-profile available
 app.use('/api', adminRoutes);  // This makes /api/admin-profile available
 
 // Use the upload routes
-app.use('/api', uploadRoutes); // This makes /api/upload available
+app.use('/api', upload); // This makes /api/upload available
 
 // Start the server
 const PORT = process.env.PORT || 5000;

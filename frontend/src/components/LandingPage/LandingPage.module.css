@@ -1,0 +1,265 @@
+.minHScreen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+  background-color: #f8fafc;
+  width:100%;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Restrict main section to scroll independently */
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  width:vw;
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+.navContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 48px;
+  margin-right: 1rem;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.navigationLinks {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navLink {
+  color: #4b5563;
+  transition: color 0.3s;
+}
+
+.navLink:hover {
+  color: #1e3a8a;
+}
+
+.loginButton {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+  text-decoration: none;
+}
+
+.signUpButton {
+  background-color: #16a34a;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+  text-decoration: none;
+}
+
+.heroSection {
+  background: linear-gradient(to right, #1e3a8a, #2563eb);
+  padding: 5rem 0;
+  margin-top:-25px;
+}
+
+.heroContent {
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+}
+
+.formContainer {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 2rem auto 0;
+}
+
+.formRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inputField {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+
+.verifyButton {
+  display: flex;
+  align-items: center;
+  background-color: #1e3a8a;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.searchIcon {
+  margin-right: 0.5rem;
+}
+
+.howItWorksSection {
+  padding: 4rem 0;
+  background-color: white;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  text-align: center;
+  font-weight: bold;
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+}
+
+.stepsGrid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.stepCard {
+  background-color: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  flex: 1;
+  max-width: 300px;
+  text-align: center;
+}
+
+.stepTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.stepDescription {
+  color: #6b7280;
+}
+
+.footer {
+  background-color: #1f2937;
+  color: white;
+  padding: 2rem 0;
+}
+
+.footerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.footerGrid {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  color: white;
+}
+
+.footerHeading {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.contactInfo {
+  margin-top: 1rem;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 1.25rem;
+}
+
+.quickLinks {
+  list-style: none;
+  padding: 1rem;
+  gap: 1rem; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-start;
+}
+
+.quickLink {
+  text-decoration: none;
+  color: #dce0e4;
+  padding: 1rem;
+}
+
+.quickLink:hover {
+  color: white; /* Hover effect to white */
+}
+
+.footerBottom {
+  border-top: 1px solid white; /* Subtle top border */
+  color: #cbd5e1;
+  padding-top: 1rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* Social Icons */
+.socialIcons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.socialIcons svg {
+  font-size: 1.5rem;
+  color: #cbd5e1;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.socialIcons svg:hover {
+  color: #ffffff; /* Hover effect to white */
+}

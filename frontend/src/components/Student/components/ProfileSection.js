@@ -1,142 +1,209 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, LinearProgress, Snackbar } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import { FiEdit2, FiMail, FiCreditCard, FiAward, FiUpload } from "react-icons/fi";
+import { IoMdClose } from "react-icons/io";
+import './ProfileSection.css';
+import Loading from '../../../utils/Loading';
 
-const ProfileSection = ({ userName, userEmail, profilePicture }) => {
-  const [open, setOpen] = useState(false);
-  const [picture, setPicture] = useState(profilePicture || '');
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+const ProfileSection = () => {
+  const [user, setUser] = useState(null); // Store user data
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
-
-   // Fetch profile picture from the backend 
-   const fetchProfilePicture = async () => {
-    const token = localStorage.getItem('authToken');
+  // Fetch user data
+  const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/get-profile-picture', {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No token found');
+        window.location.href = '/signup';
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/user-profile', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch profile picture.');
-      }
-
-      const result = await response.json();
-      setPicture(result.profilePicture);  // Set the profile picture in the component state
-    } catch (error) {
-      setError('Error retrieving profile picture');
-    }
-  };
-
-  // Fetch profile picture when the component mounts
-  useEffect(() => {
-    fetchProfilePicture();
-  }, []);  // Only run on component mount
-
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      uploadProfilePicture(file);
-    }
-  };
-
-  const uploadProfilePicture = async (file) => {
-    const formData = new FormData();
-    formData.append('profilePicture', file);
-
-    try {
-      setIsUploading(true);
-      setError('');
-
-      // Call backend to upload the file
-      const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/update-profile-picture', {
-        method: 'POST',
-        headers: {
           'Authorization': `Bearer ${token}`
-        },
-        body: formData
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to upload profile picture.');
+      if (response.status === 401) {
+        console.error('Unauthorized, token might be invalid');
+        window.location.href = '/signup';
+        return;
       }
 
-      const result = await response.json();
-      setPicture(result.user.profilePicture);  // Update the profile picture with new base64 string
-      setIsUploading(false);
-      setOpen(false);
-      setSuccessMessage('Profile picture uploaded successfully!');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Fetched User Data:', data); // Log the response data
+        setUser(data); // Save user data
+      } else {
+        console.error('Failed to fetch user data');
+      }
     } catch (error) {
-      setError('Failed to upload profile picture. Please try again.');
-      setIsUploading(false);
+      console.error('Error fetching user data:', error);
     }
   };
+
+  useEffect(() => {
+    fetchUserData(); // Fetch data on component mount
+  }, []);
+
+  // Utility function to format Ethereum address
+  const formatEthereumAddress = (address) => {
+    return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Address not available';
+  };
+
+  const handleEmailEdit = () => {
+    setNewEmail(user?.email || ""); // Set initial email from fetched user data
+    setIsEditingEmail(true);
+  };
+
+  const handleEmailSave = () => {
+    setUser((prevUser) => ({ ...prevUser, email: newEmail }));
+    setIsEditingEmail(false);
+  };
+
+  const handleImageUpload = (event) => {
+    console.log("Image upload triggered");
+    setShowModal(false);
+  };
+
+  if (!user) {
+    return <Loading/>; // Display loading until user data is fetched
+  }
 
   return (
-    <aside className="sidebar">
-      <div 
-        className="profile-section"
-        onClick={() => setOpen(true)}  // Clicking on the profile section triggers the dialog
-        style={{ cursor: 'pointer' }}
-      >
-        <div className="profile-pic-wrapper">
+    <div className="profile-container">
+      {/* Left column: Profile details */}
+      <div className="profile-card">
+        <div className="relative">
           <img
-            src={picture ? `data:image/png;base64,${picture}` : 'https://placehold.co/100x100'}
-            alt="User Profile"
-            className="profile-pic"
-            style={{
-              borderRadius: '50%',
-              border: '2px solid #000',
-              width: '100px',
-              height: '100px',
-            }}
+            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d"
+            alt="Profile"
+            onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633332755192-727a05c4013d"; }}
           />
+          <button
+            onClick={() => setShowModal(true)}
+            className="edit-profile-picture-btn"
+            aria-label="Edit profile picture"
+          >
+            <FiEdit2 />
+          </button>
+          
         </div>
-        <h2 className="profile-name">{userName}</h2>
-        <p className="profile-email"> {userEmail}</p>
-        {/* Change button to View Profile */}
-        <button className="profile-btn">View Profile</button>
+        <h2 className="profile-name">{`${user?.firstName || ''} ${user?.lastName || ''}`}</h2>
+          <p className="profile-role">{user?.role || 'Role not available'}</p> 
+          <p className="profile-student-number">{user?.studentNumber || 'Student Number not available'}</p> 
+          <p className="profile-email">{user?.email || 'Email not available'}</p>
+          <p className="profile-ethereum-address">{formatEthereumAddress(user.ethereumAddress)}</p>
       </div>
 
-      {/* Dialog to prompt user to upload profile picture */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{picture ? "Update Profile Picture" : "Upload Profile Picture"}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {picture 
-              ? "Do you want to update your profile picture?" 
-              : "Please upload a formal passport-size photo with a white background."
-            }
-          </Typography>
-          <input type="file" onChange={handleFileChange} accept="image/*" />
+      
 
-          {isUploading && (
-            <div style={{ marginTop: 20 }}>
-              <Typography>Uploading...</Typography>
-              <LinearProgress />
+      {/* Right column: Email, transactions, and certificates */}
+      <div className="detail-card">
+        {/* Email Section */}
+        <h3>
+          <FiMail /> Email
+        </h3>
+        <div className="email-field">
+          {isEditingEmail ? (
+            <div>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+              />
+              <button onClick={handleEmailSave} className="email-save-btn">Save</button>
             </div>
+          ) : (
+            <span>{user.email}</span>
           )}
+          {!isEditingEmail && (
+            <button onClick={handleEmailEdit} className="email-edit-btn">
+              <FiEdit2 />
+            </button>
+          )}
+        </div>
 
-          {error && <Typography color="error">{error}</Typography>}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="primary">Cancel</Button>
-        </DialogActions>
-      </Dialog>
+        {/* Transactions Section */}
+        <h3>
+          <FiCreditCard /> Transactions
+        </h3>
+        <div className="transactions-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {user.transactions?.map((tx) => (
+                <tr key={tx.id}>
+                  <td>{tx.date}</td>
+                  <td>{tx.type}</td>
+                  <td>{tx.amount}</td>
+                  <td>
+                    <span className="status-completed">{tx.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      {/* Snackbar for success message */}
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={6000}
-        onClose={() => setSuccessMessage('')}
-        message={successMessage}
-      />
-    </aside>
+        {/* Certificates Section */}
+        <h3>
+          <FiAward /> Certificates
+        </h3>
+        <div className="certificates-grid">
+          {user.certificates?.map((cert) => (
+            <div key={cert.id} className="certificate-item">
+              <h4>{cert.name}</h4>
+              <p>Issued by: {cert.issuer}</p>
+              <p>Date: {cert.issueDate}</p>
+            </div>
+          ))}
+        </div>
+        
+      </div>
+
+      {/* Modal for Profile Picture Upload */}
+      {showModal && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <div className="flex justify-between items-center mb-4">
+              <h3>Update Profile Picture</h3>
+              <button onClick={() => setShowModal(false)}>
+                <IoMdClose />
+              </button>
+            </div>
+            <div className="upload-instructions">
+              <FiUpload />
+              <p>Click to upload or drag and drop</p>
+              <p>SVG, PNG, JPG (max. 800x800px)</p>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="profile-upload"
+            />
+            <button
+              onClick={() => document.getElementById("profile-upload").click()}
+              className="upload-button"
+            >
+              Select Image
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

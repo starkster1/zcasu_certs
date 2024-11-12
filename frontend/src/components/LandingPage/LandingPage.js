@@ -1,109 +1,164 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';  // Import the Link component
-import { FaHome, FaInfoCircle, FaEnvelope, FaCheckCircle } from 'react-icons/fa';
-import { motion } from 'framer-motion';
-import './LandingPage.css';
+// LandingPage.js
+
+import { Link } from 'react-router-dom';
+import React, { useState } from "react"; 
+import { FaSearch, FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaTwitter, FaLinkedin, FaInstagram } from "react-icons/fa";
+import styles from './LandingPage.module.css';
 
 const LandingPage = () => {
-  const [certificateId, setCertificateId] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationResult, setVerificationResult] = useState(null);
+  const [certificateId, setCertificateId] = useState("");
 
-  const handleVerify = (e) => {
+  const handleVerification = (e) => {
     e.preventDefault();
-    setIsVerifying(true);
-    // Simulating verification process
-    setTimeout(() => {
-      setVerificationResult(Math.random() > 0.5 ? 'valid' : 'invalid');
-      setIsVerifying(false);
-    }, 2000);
+    console.log("Verifying certificate:", certificateId);
   };
 
+  const navigation = [
+    { name: "Home", href: "#home" },
+    { name: "About", href: "#about" },
+    { name: "Services", href: "#services" },
+    { name: "Contact", href: "#contact" },
+  ];
+
   return (
-    <div className="landing-page">
-      <header className="header">
-        <div className="header-container">
-          <img
-            src="https://example.com/zcas-logo.png"
-            alt="ZCAS University Logo"
-            className="logo"
-          />
-          <nav>
-            <ul className="nav-links">
-              <li>
-                <a href="#home" className="nav-link">
-                  <FaHome className="icon" />
-                  Home
+    <div className={styles.minHScreen}>
+      <header className={styles.header}>
+        <nav className={styles.navContainer}>
+          <div className={styles.navContent}>
+            <div className={styles.logoSection}>
+              <img
+                src="https://esis.zcasu.edu.zm/templates//zcasu/images/header.png"
+                alt="ZCAS University Logo"
+                className={styles.logo}
+              />
+              <span className={styles.logoText}>ZCAS University</span>
+            </div>
+            <div className={styles.navigationLinks}>
+              {navigation.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className={styles.navLink}
+                >
+                  {item.name}
                 </a>
-              </li>
-              <li>
-                <a href="#contact" className="nav-link">
-                  <FaEnvelope className="icon" />
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a href="#about" className="nav-link">
-                  <FaInfoCircle className="icon" />
-                  About
-                </a>
-              </li>
-              
-            </ul>
-          </nav>
-        </div>
+              ))}
+              <Link to="/signin" className={styles.loginButton}>Get Started</Link>
+            </div>
+          </div>
+        </nav>
       </header>
 
-      <main className="main-content">
-        <motion.header
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="flex justify-center mb-12"
-        >
-          <h1 className="title">Blockchain Certificate Verification</h1>
-        </motion.header>
+      {/* Make main content scrollable */}
+      <div className={styles.mainContent}>
+        <main>
+          <section className={styles.heroSection}>
+            <div className={styles.heroContent}>
+              <h1 className={styles.heroTitle}>
+                Blockchain Certificate Verification System
+              </h1>
+              <p className={styles.heroSubtitle}>
+                Verify your ZCAS University certificates securely and instantly
+              </p>
+              <form onSubmit={handleVerification} className={styles.formContainer}>
+                <div className={styles.formRow}>
+                  <input
+                    type="text"
+                    value={certificateId}
+                    onChange={(e) => setCertificateId(e.target.value)}
+                    placeholder="Enter Certificate ID"
+                    className={styles.inputField}
+                  />
+                  <button
+                    type="submit"
+                    className={styles.verifyButton}
+                  >
+                    <FaSearch className={styles.searchIcon} />
+                    Verify Certificate
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
 
-        <form onSubmit={handleVerify} className="mb-12">
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <input
-              type="text"
-              value={certificateId}
-              onChange={(e) => setCertificateId(e.target.value)}
-              placeholder="Enter Certificate ID"
-              className="w-full sm:w-96 px-4 py-2 rounded-md border-2 border-gray-300 focus:border-blue-500 focus:outline-none"
-              aria-label="Certificate ID"
-            />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
-              disabled={isVerifying}
-            >
-              {isVerifying ? 'Verifying...' : 'Verify Certificate'}
-            </motion.button>
+          <section className={styles.howItWorksSection}>
+            <div className={styles.container}>
+              <h2 className={styles.sectionTitle}>
+                How It Works
+              </h2>
+              <div className={styles.stepsGrid}>
+                {[
+                  {
+                    title: "Upload Certificate",
+                    description: "Submit your certificate ID for verification",
+                  },
+                  {
+                    title: "Blockchain Verification",
+                    description: "Our system verifies the certificate authenticity",
+                  },
+                  {
+                    title: "Get Results",
+                    description: "Receive instant verification results",
+                  },
+                ].map((step, index) => (
+                  <div
+                    key={index}
+                    className={styles.stepCard}
+                  >
+                    <h3 className={styles.stepTitle}>
+                      {step.title}
+                    </h3>
+                    <p className={styles.stepDescription}>{step.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className={styles.footer}>
+      <div className={styles.footerContainer}>
+        <div className={styles.footerGrid}>
+          <div>
+            <h3 className={styles.footerHeading}>Contact Us</h3>
+            <div className={styles.contactInfo}>
+              <p className={styles.contactItem}>
+                <FaPhone className={styles.icon} /> +260 211 232093 / 5
+              </p>
+              <p className={styles.contactItem}>
+                <FaEnvelope className={styles.icon} /> info@zcasu.edu.zm
+              </p>
+              <p className={styles.contactItem}>
+                <FaMapMarkerAlt className={styles.icon} /> Dedan Kimathi Road, Lusaka, Zambia
+              </p>
+            </div>
           </div>
-        </form>
-        {verificationResult && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-4 rounded-md ${verificationResult === 'valid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-          >
-            <FaCheckCircle className="inline-block mr-2" />
-            {verificationResult === 'valid' ? 'Certificate is valid!' : 'Certificate is invalid. Please check the ID and try again.'}
-          </motion.div>
-        )}
-        <div className="button-group">
-          <Link to="/signup" className="signup-button">Sign Up</Link>  {/* Link to Sign Up */}
-          <Link to="/signin" className="login-button">Login</Link>    {/* Link to Login */}
+          <div>
+            <h3 className={styles.footerHeading}>Quick Links</h3>
+            <ul className={styles.quickLinks}>
+              <li><Link to="#" className={styles.quickLink}>About Us</Link></li>
+              <li><Link to="#" className={styles.quickLink}>Programs</Link></li>
+              <li><Link to="#" className={styles.quickLink}>Student Portal</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className={styles.footerHeading}>Follow Us</h3>
+            <p className={styles.socialText}>Stay connected with us on social media</p>
+            <div className={styles.socialIcons}>
+              <FaFacebook className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+              <FaTwitter className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+              <FaLinkedin className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+              <FaInstagram className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+            </div>
+          </div>
         </div>
-      </main>
+        <div className={styles.footerBottom}>
+          <p>© 2024 ZCAS University. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
 
-      <footer className="footer">
-        <p>&copy; 2024 ZCAS University. All rights reserved.</p>
-      </footer>
+      </div>
     </div>
   );
 };

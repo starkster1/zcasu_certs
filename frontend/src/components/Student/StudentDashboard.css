@@ -1,19 +1,71 @@
+
+/* Styles for the main content */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 /* Sidebar */
 .sidebar {
+  width: 10rem;
   background-color: #1f2937; /* Dark grey color */
   color: white;
-  padding: 2rem;
+  padding: 0.5rem;
   transition: all 0.3s ease-in-out;
+  min-width: 3.5rem; /* Adjust based on icon size */
 }
+
+.sidebar.w-20 .sidebar-item span {
+  display: none; /* Hide the text when collapsed */
+}
+
+.sidebar.w-20 .sidebar-btn span {
+  display: none; /* Hide text when sidebar is collapsed */
+}
+
 
 .sidebar-btn {
   background-color: transparent;
   color: white;
   text-align: left;
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1rem;
+  justify-content: center; /* Center icons when sidebar is collapsed */
+}
+/* Spacing between sidebar items */
+.sidebar-item {
+  margin-bottom: 1rem; /* Space between items */
+  width:90%;
+  height: 4rem; /* Adjust height as needed */
+}
+
+.sidebar-icon {
+  font-size: 1.25rem; /* Adjust icon size as needed */
+}
+
+.sidebar-text {
+  font-size: 1rem;
+  flex-grow: 1;
+}
+
+.sidebar-item span {
+  text-align: left;
+  margin-left: 0.25rem; /* Ensures slight leaning towards the icon */
+  flex-grow: 1;
 }
 
 .sidebar-btn:hover {
   background-color: #374151; /* Lighter grey on hover */
+  padding: 1.2rem; 
+}
+
+.sidebar-btn.active {
+  background-color: #2e333b; /* Blue background for active tab */
+  color: white;
+  padding: 1.2rem; 
 }
 
 /* Sidebar Title */
@@ -24,57 +76,70 @@
 
 /* Toggle Sidebar Button */
 .toggle-sidebar-btn {
-  padding: 0.5rem;
-  background-color: transparent;
-  color: white;
+  font-size: 1.5rem;
+  transition: transform 0.3s;
 }
 
 .toggle-sidebar-btn:hover {
   background-color: #374151;
 }
 
-/* Header */
+.toggle-sidebar-btn .rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* When Sidebar is Expanded */
+.sidebar.w-64 .sidebar-btn {
+  justify-content: start; /* Align icons with text */
+}
+
+.sidebar.w-64 .sidebar-item span {
+  display: inline; /* Show text when sidebar is expanded */
+}
+/* Fixed header styling */
 .header {
-  background-color: white;
+  background-color: #2b1b34;
   padding: 1rem;
+  top: 2;
+  z-index: 10;
+  position: sticky;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  align-content: center;
+  justify-content: space-between; 
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width:99%;
+  margin-top: -30px;
 }
 
 .search-bar {
-  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1; /* Takes available space */
+  max-width: 700px; /* Optional, to limit width */
+  margin-right: 1rem; /* Add space between search bar and user profile */
 }
 
 .search-input {
-  padding-left: 2.5rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 9999px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
 }
 
 .search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280; /* Gray color */
+  margin-left: -30px; /* Position icon inside the input */
+  color: #aaa;
+  cursor: pointer;
+   min-width: 2rem; /* Ensures icon remains visible and aligned */
 }
 
-/* Profile Button */
-.profile-btn {
-  padding: 0.5rem;
-  background-color: transparent;
-  color: black;
+/* Scrollable content area */
+.dashboard-scrollable-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 1rem;
+  width: 100%;
 }
-
-.profile-btn:hover {
-  background-color: #f3f4f6; /* Light grey hover */
-}
-
 /* Dashboard Content */
 .dashboard-heading {
   font-size: 2.25rem;
@@ -89,6 +154,7 @@
   border-radius: 0.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease-in-out;
+  margin-top: 40px;
 }
 
 .dashboard-section:hover {
@@ -102,12 +168,6 @@
   margin-bottom: 1rem;
 }
 
-/* Section Text */
-.section-text {
-  color: #6b7280; /* Gray color for text */
-  margin-bottom: 1.5rem;
-}
-
 /* Button - Verify Certificate */
 .verify-btn {
   background-color: #3b82f6; /* Blue color */
@@ -118,7 +178,7 @@
 }
 
 .verify-btn:hover {
-  background-color: #2563eb; /* Darker blue on hover */
+  background-color: #2563eb;
 }
 
 /* Section List */
@@ -138,4 +198,20 @@
 
 .quick-link:hover {
   text-decoration: underline;
+}
+
+.wave-hand {
+  display: inline-block;
+  animation: wave 1.5s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  15% { transform: rotate(-15deg); }
+  30% { transform: rotate(10deg); }
+  45% { transform: rotate(-10deg); }
+  60% { transform: rotate(6deg); }
+  75% { transform: rotate(-6deg); }
+  100% { transform: rotate(0deg); }
 }

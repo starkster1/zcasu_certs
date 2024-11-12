@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import Web3 from "web3";
-import MultiSigWalletABI from "./abi/MultiSigWallet.json";
+
 
 function Wallet({ account }) {
   const [contract, setContract] = useState(null);
@@ -62,3 +62,4 @@ function Wallet({ account }) {
 }
 
 export default Wallet;
+*/

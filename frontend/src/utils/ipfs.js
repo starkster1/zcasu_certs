@@ -1,26 +1,29 @@
 import axios from 'axios';
 
-// Function to upload file to Pinata IPFS
-export const uploadToIPFS = async (fileBuffer) => {
-  // Use the full backend URL for the upload API endpoint
-  const url = 'http://localhost:5000/api/upload';
+const PINATA_API_KEY = 'e4da6b59c2b33a9cb44b';
+const PINATA_SECRET_KEY = 'ee4022572d95b88b82c6ca53806118aae97d9b554bb54ee9835fe36fa887316d';
 
-  const data = new FormData();
-  data.append('file', fileBuffer);
-
+export const uploadToIPFS = async (file, onProgress) => {
   try {
-    // Make the API request to your backend
-    const response = await axios.post(url, data, {
-      maxBodyLength: 'Infinity', // Handle large files
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+      maxBodyLength: Infinity,
       headers: {
         'Content-Type': 'multipart/form-data',
+        pinata_api_key: PINATA_API_KEY,
+        pinata_secret_api_key: PINATA_SECRET_KEY,
+      },
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 100));
+        if (onProgress) onProgress(percentCompleted); // Call progress callback
       },
     });
 
-    console.log('Pinata IPFS Result:', response.data);
-    return response.data.IpfsHash; // Return IPFS hash from Pinata response
+    return response.data.IpfsHash;
   } catch (error) {
-    console.error('Pinata IPFS Upload Failed:', error);
-    throw error;
+    console.error('Error uploading to IPFS:', error);
+    throw new Error('Failed to upload to IPFS');
   }
 };

@@ -7,6 +7,8 @@
   width: 90%; /* Ensure the container takes full width */
   max-width: 1200px; /* Optional: Limit the maximum width of the container */
   margin: 0 auto; /* Center the container horizontally */
+  text-align:center;
+  align-items: center;
 }
 
 

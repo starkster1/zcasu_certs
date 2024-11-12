@@ -1,16 +1,14 @@
-// migrations/2_deploy_contracts.js
-
 const ZCASUCertificate = artifacts.require("ZCASUCertificate");
-const MultiSigWallet = artifacts.require("MultiSigWallet");
-const StudentProfile = artifacts.require("StudentProfile");  // Add the new contract
 
-module.exports = function(deployer, network, accounts) {
-  // Deploy the ZCASUCertificate contract
-  deployer.deploy(ZCASUCertificate);
-  
-  // Deploy the MultiSigWallet contract with example owners: student and institute
-  deployer.deploy(MultiSigWallet, accounts[0], accounts[1]);
+module.exports = async function (deployer, network, accounts) {
+    // Deploy the contract
+    await deployer.deploy(ZCASUCertificate);
+    const certificateInstance = await ZCASUCertificate.deployed();
 
-  // Deploy the StudentProfile contract
-  deployer.deploy(StudentProfile);
+    // Log the deployed contract address
+    console.log("ZCASUCertificate contract deployed at:", certificateInstance.address);
+
+    // Log the institute address (the account used for deployment)
+    const instituteAddress = accounts[0];
+    console.log("Institute (deployer) address:", instituteAddress);
 };

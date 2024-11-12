@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { connectToMetaMask } from '../../utils/metamask';
+import { useWallet } from '../../contexts/WalletContext'; // useWallet for wallet connection
 import './SignUp.css';
 import { motion } from 'framer-motion';
 import { FaEthereum } from 'react-icons/fa';
 
-const SignUpPage = ({ account, setUserProfile }) => {
+const SignUpPage = ({ setUserProfile }) => {
+  const { account, connectWallet } = useWallet(); // Destructure connectWallet and account
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -14,17 +15,15 @@ const SignUpPage = ({ account, setUserProfile }) => {
     ethereumAddress: account || '',
     password: ''  
   });
-
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [metaMaskError, setMetaMaskError] = useState('');
-  const [isMetaMaskConnected, setIsMetaMaskConnected] = useState(false);
   const navigate = useNavigate();
 
+  // Auto-update ethereum address if account changes
   useEffect(() => {
     if (account) {
       setFormData((prevData) => ({ ...prevData, ethereumAddress: account }));
-      setIsMetaMaskConnected(true);
     }
   }, [account]);
 
@@ -40,25 +39,17 @@ const SignUpPage = ({ account, setUserProfile }) => {
     const lowercaseRegex = /[a-z]/;
     const numberRegex = /\d/;
     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
-
-    let message = '';
-    if (password.length < minLength) {
-      message = 'Password must be at least 6 characters';
-    } else if (!uppercaseRegex.test(password)) {
-      message = 'Password must include at least one uppercase letter';
-    } else if (!lowercaseRegex.test(password)) {
-      message = 'Password must include at least one lowercase letter';
-    } else if (!numberRegex.test(password)) {
-      message = 'Password must include at least one number';
-    } else if (!specialCharRegex.test(password)) {
-      message = 'Password must include at least one special character';
-    }
-
-    return message;
+    
+    if (password.length < minLength) return 'Password must be at least 6 characters';
+    if (!uppercaseRegex.test(password)) return 'Password must include at least one uppercase letter';
+    if (!lowercaseRegex.test(password)) return 'Password must include at least one lowercase letter';
+    if (!numberRegex.test(password)) return 'Password must include at least one number';
+    if (!specialCharRegex.test(password)) return 'Password must include at least one special character';
+    return '';
   };
 
   const validateField = (name, value) => {
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
     switch (name) {
       case 'firstName':
       case 'lastName':
@@ -102,16 +93,7 @@ const SignUpPage = ({ account, setUserProfile }) => {
 
   const handleMetaMaskConnection = async () => {
     try {
-      if (isMetaMaskConnected) {
-        setIsMetaMaskConnected(false);
-        setFormData((prevData) => ({ ...prevData, ethereumAddress: '' }));
-        console.log('Disconnected from MetaMask');
-      } else {
-        const ethereumAddress = await connectToMetaMask();
-        setFormData({ ...formData, ethereumAddress });
-        setIsMetaMaskConnected(true);
-        console.log('Connected to MetaMask:', ethereumAddress);
-      }
+      await connectWallet(); // Call connectWallet from useWallet to connect MetaMask
     } catch (error) {
       setMetaMaskError(error.message);
     }
@@ -120,7 +102,7 @@ const SignUpPage = ({ account, setUserProfile }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isMetaMaskConnected) {
+    if (!account) {
       setMetaMaskError('MetaMask account not connected.');
       return;
     }
@@ -146,6 +128,8 @@ const SignUpPage = ({ account, setUserProfile }) => {
       const data = await response.json();
       if (response.ok) {
         setSuccessMessage('Registration Successful! Redirecting to login...');
+        // Call connectWallet after successful registration to ensure wallet connection
+        await connectWallet();
         setTimeout(() => {
           setSuccessMessage('');
           navigate('/signin');
@@ -159,21 +143,25 @@ const SignUpPage = ({ account, setUserProfile }) => {
     }
   };
 
+  // Handle navigation to the sign-in page
+  const goToSignIn = () => {
+    navigate('/signin');
+  };
+
   return (
     <div className="container">
-      {/* MetaMask Connect Button on the top right corner */}
       <div className="button-wrapper">
         <button
           type="button"
           className="button-connect"
           onClick={handleMetaMaskConnection}
           style={{
-            backgroundColor: isMetaMaskConnected
+            backgroundColor: account
               ? 'rgba(255, 183, 0, 0.708)' // Gold color for "Connected"
               : '#3e2272' // Purple color for "Connect"
           }}
         >
-          {isMetaMaskConnected ? 'Connected' : 'Connect'}
+          {account ? 'Connected' : 'Connect'}
         </button>
       </div>
 
@@ -187,21 +175,16 @@ const SignUpPage = ({ account, setUserProfile }) => {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
                 First Name
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex-items-center pl-3">
-                  <i className="fas fa-user text-gray-400"></i>
-                </span>
-                <input
-                  type="text"
-                  name="firstName"
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className={`w-full py-2 px-3 pl-12 border ${errors.firstName ? 'border-red-300' : ''} rounded-lg shadow-sm`}
-                  placeholder="John"
-                />
-                {errors.firstName && <p className="text-red-500 text-xs italic">{errors.firstName}</p>}
-              </div>
+              <input
+                type="text"
+                name="firstName"
+                id="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className={`w-full py-2 px-3 border ${errors.firstName ? 'border-red-300' : ''} rounded-lg shadow-sm`}
+                placeholder="John"
+              />
+              {errors.firstName && <p className="text-red-500 text-xs italic">{errors.firstName}</p>}
             </div>
 
             {/* Last Name Field */}
@@ -209,21 +192,16 @@ const SignUpPage = ({ account, setUserProfile }) => {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastName">
                 Last Name
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex-items-center pl-3">
-                  <i className="fas fa-user text-gray-400"></i>
-                </span>
-                <input
-                  type="text"
-                  name="lastName"
-                  id="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className={`w-full py-2 px-3 pl-12 border ${errors.lastName ? 'border-red-300' : ''} rounded-lg shadow-sm`}
-                  placeholder="Doe"
-                />
-                {errors.lastName && <p className="text-red-500 text-xs italic">{errors.lastName}</p>}
-              </div>
+              <input
+                type="text"
+                name="lastName"
+                id="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className={`w-full py-2 px-3 border ${errors.lastName ? 'border-red-300' : ''} rounded-lg shadow-sm`}
+                placeholder="Doe"
+              />
+              {errors.lastName && <p className="text-red-500 text-xs italic">{errors.lastName}</p>}
             </div>
 
             {/* Student Number Field */}
@@ -231,21 +209,16 @@ const SignUpPage = ({ account, setUserProfile }) => {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="studentNumber">
                 Student Number
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex-items-center pl-3">
-                  <i className="fas fa-id-card text-gray-400"></i>
-                </span>
-                <input
-                  type="text"
-                  name="studentNumber"
-                  id="studentNumber"
-                  value={formData.studentNumber}
-                  onChange={handleChange}
-                  className={`w-full py-2 px-3 pl-12 border ${errors.studentNumber ? 'border-red-300' : ''} rounded-lg shadow-sm`}
-                  placeholder="202100154"
-                />
-                {errors.studentNumber && <p className="text-red-500 text-xs italic">{errors.studentNumber}</p>}
-              </div>
+              <input
+                type="text"
+                name="studentNumber"
+                id="studentNumber"
+                value={formData.studentNumber}
+                onChange={handleChange}
+                className={`w-full py-2 px-3 border ${errors.studentNumber ? 'border-red-300' : ''} rounded-lg shadow-sm`}
+                placeholder="202100154"
+              />
+              {errors.studentNumber && <p className="text-red-500 text-xs italic">{errors.studentNumber}</p>}
             </div>
 
             {/* Email Field */}
@@ -253,21 +226,16 @@ const SignUpPage = ({ account, setUserProfile }) => {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                 Email Address
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex-items-center pl-3">
-                  <i className="fas fa-envelope text-gray-400"></i>
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full py-2 px-3 pl-12 border ${errors.email ? 'border-red-300' : ''} rounded-lg shadow-sm`}
-                  placeholder="john.doe@example.com"
-                />
-                {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
-              </div>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`w-full py-2 px-3 border ${errors.email ? 'border-red-300' : ''} rounded-lg shadow-sm`}
+                placeholder="john.doe@example.com"
+              />
+              {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
             </div>
 
             {/* Password Field */}
@@ -275,21 +243,16 @@ const SignUpPage = ({ account, setUserProfile }) => {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                 Password
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex-items-center pl-3">
-                  <i className="fas fa-lock text-gray-400"></i>
-                </span>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full py-2 px-3 pl-12 border ${errors.password ? 'border-red-300' : ''} rounded-lg shadow-sm`}
-                  placeholder="******"
-                />
-                {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
-              </div>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`w-full py-2 px-3 border ${errors.password ? 'border-red-300' : ''} rounded-lg shadow-sm`}
+                placeholder="******"
+              />
+              {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
             </div>
 
             <button
@@ -299,9 +262,11 @@ const SignUpPage = ({ account, setUserProfile }) => {
               <FaEthereum />
               <span>Proceed</span>
             </button>
+            <p className="text-center">
+              Already have an account? <a href="#" onClick={goToSignIn}>Login</a>
+            </p>
           </form>
 
-          {/* Success Message */}
           {successMessage && <p className="success-message">{successMessage}</p>}
         </div>
 

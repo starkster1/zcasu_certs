@@ -8,8 +8,6 @@ const router = express.Router();
 
 // Smart contract ABI and address (deployed on Ganache or another network)
 const contractABI = [
-  // Add your contract ABI here
-  
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -26,9 +24,21 @@ const contractABI = [
       },
       {
         "indexed": true,
-        "internalType": "bytes32",
-        "name": "certId",
-        "type": "bytes32"
+        "internalType": "address",
+        "name": "institute",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "name": "CertificateIssued",
@@ -39,49 +49,44 @@ const contractABI = [
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes32",
-        "name": "certId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "verified",
-        "type": "bool"
-      }
-    ],
-    "name": "CertificateVerified",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "name": "certificates",
-    "outputs": [
-      {
         "internalType": "address",
         "name": "student",
         "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      }
+    ],
+    "name": "CertificateRevoked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "student",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "string",
         "name": "ipfsHash",
         "type": "string"
       },
       {
+        "indexed": false,
         "internalType": "bool",
-        "name": "verified",
+        "name": "isValid",
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "name": "CertificateVerified",
+    "type": "event"
   },
   {
     "inputs": [],
@@ -105,7 +110,7 @@ const contractABI = [
         "type": "address"
       }
     ],
-    "name": "pendingApprovals",
+    "name": "isRegisteredStudent",
     "outputs": [
       {
         "internalType": "bool",
@@ -123,29 +128,68 @@ const contractABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "students",
+    "name": "studentCertificates",
     "outputs": [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
       {
         "internalType": "address",
         "name": "student",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "institute",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isValid",
+        "type": "bool"
       }
     ],
-    "name": "addStudent",
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "usedHashes",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "registerAsStudent",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -153,13 +197,8 @@ const contractABI = [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "student",
-        "type": "address"
-      },
-      {
         "internalType": "string",
-        "name": "ipfsHash",
+        "name": "_ipfsHash",
         "type": "string"
       }
     ],
@@ -171,9 +210,14 @@ const contractABI = [
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "certId",
-        "type": "bytes32"
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isValid",
+        "type": "bool"
       }
     ],
     "name": "verifyCertificate",
@@ -184,12 +228,12 @@ const contractABI = [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "student",
-        "type": "address"
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
       }
     ],
-    "name": "requestApproval",
+    "name": "revokeCertificate",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -198,18 +242,98 @@ const contractABI = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "student",
+        "name": "_student",
         "type": "address"
       }
     ],
-    "name": "approveStudent",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "name": "getCertificates",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "student",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "institute",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isValid",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ZCASUCertificate.Certificate[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      }
+    ],
+    "name": "getCertificateDetails",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "student",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "institute",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isValid",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ZCASUCertificate.Certificate",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
   }
-
 ];
-const contractAddress = '0x9d8a4D0C143bB7A23C43B05CAc89e53a9674B154'; // Replace with your contract address
+const contractAddress = '0x718E250168145e4EB7653d7775Ba439A598693e4'; // Replace with your contract address
 
 // MetaMask verification utility function for admin
 const checkMetaMaskAdmin = async (ethAddress) => {
@@ -429,15 +553,14 @@ router.get('/user-profile', authenticateToken, async (req, res) => {
     let userProfile;
 
     if (req.userRole === 'student') {
-      userProfile = await User.findById(req.userId).select('-password');  // Fetch student profile without the password
+      userProfile = await User.findById(req.userId)
+        .select('firstName lastName email studentNumber role ethereumAddress profilePicture');
       if (!userProfile) return res.status(404).json({ message: 'Student not found' });
     } else if (req.userRole === 'admin') {
-      userProfile = await Admin.findById(req.userId).select('-password');  // Fetch admin profile without the password
+      userProfile = await Admin.findById(req.userId)
+        .select('firstName lastName email role ethereumAddress profilePicture');
       if (!userProfile) return res.status(404).json({ message: 'Admin not found' });
-    } else {
-      return res.status(403).json({ message: 'Invalid user role' });
     }
-
     return res.status(200).json(userProfile);
   } catch (error) {
     console.error('Error fetching user profile:', error);
