@@ -30,8 +30,9 @@ const MyDocuments = ({ instituteAddress }) => {
   useEffect(() => {
     const init = async () => {
       if (!account) {
-        await connectWallet();  // Prompt wallet connection if not connected
-      } else {
+        await connectWallet(); // Ensure wallet is connected
+      } 
+      if (account) {
         loadDocuments();
       }
     };
@@ -39,20 +40,22 @@ const MyDocuments = ({ instituteAddress }) => {
   }, [account, connectWallet]);
 
   const loadDocuments = async () => {
-    if (!account) return;
-
+    if (!account) {
+      toast.error("Please connect your wallet to view documents.");
+      return;
+    }
     try {
-      const certificates = await getCertificates(account);
+      const certificates = await getCertificates(account); // Fetch certificates
       const formattedDocs = certificates.map((cert) => ({
         hash: cert.ipfsHash,
         status: cert.isValid ? 'Verified' : 'Pending',
         timestamp: Number(cert.timestamp)
       }));
 
-      setDocuments(formattedDocs);
+      setDocuments(formattedDocs); // Update state
     } catch (error) {
       console.error("Error loading documents:", error);
-      toast.error("Failed to load documents");
+      toast.error("Failed to load documents.");
     }
   };
 
@@ -97,7 +100,7 @@ const MyDocuments = ({ instituteAddress }) => {
       setCertificate(ipfsHash);
       setIsUploading(false);
       toast.success("Document uploaded to IPFS successfully!");
-      await newUpload(ipfsHash);
+      await newUpload(ipfsHash); // Register document on blockchain
     } catch (error) {
       setUploadError("Failed to upload document to IPFS");
       setIsUploading(false);
@@ -111,9 +114,7 @@ const MyDocuments = ({ instituteAddress }) => {
       toast.error("Please connect your wallet first");
       return;
     }
-
     const success = await registerCertificate(ipfsHash, instituteAddress);
-    
     if (success) {
       toast.success("Certificate successfully registered on blockchain!");
       handleClose();
@@ -124,7 +125,6 @@ const MyDocuments = ({ instituteAddress }) => {
   const getDoc = (hash) => {
     window.open(`https://gateway.pinata.cloud/ipfs/${hash}`, '_blank');
   };
-
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
@@ -141,7 +141,7 @@ const MyDocuments = ({ instituteAddress }) => {
                   <FileText className="h-5 w-5" />
                 </Avatar>
                 <div>
-                  <h3 className="font-semibold">Document #{index + 1}</h3>
+                  <h3 className="font-semibold">Certificate #{index + 1}</h3>
                   <p className="text-sm text-gray-600">Status: {doc.status}</p>
                   <p className="text-xs text-gray-500">
                     {new Date(doc.timestamp * 1000).toLocaleDateString()}
@@ -219,165 +219,6 @@ const MyDocuments = ({ instituteAddress }) => {
 };
 
 export default MyDocuments;
-
-
-
-/*import React, { Component } from 'react';
-import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, LinearProgress, Typography, Avatar } from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import { green, red } from '@mui/material/colors';
-import { uploadToIPFS } from '../../../utils/ipfs';
-import { toast } from 'react-toastify';
-import { ethers } from 'ethers';
-import 'react-toastify/dist/ReactToastify.css';
-import ZCASUCertificate from '../../../contracts/ZCASUCertificate.json'; // Contract ABI
-
-class MyDocuments extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-      certificate: "",
-      documents: [],
-      uploadProgress: 0,
-      uploadError: "",
-      isUploading: false,
-    };
-  }
-
-  handleClickOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleClose = () => {
-    this.setState({ open: false, uploadProgress: 0, uploadError: "", certificate: "" });
-  };
-
-  captureFile = (event) => {
-    event.preventDefault();
-    const file = event.target.files[0];
-    this.uploadDocument(file);
-  };
-
-  uploadDocument = async (file) => {
-    console.log("Uploading document to IPFS...");
-    try {
-      this.setState({ isUploading: true, uploadProgress: 0, uploadError: "" });
-
-      const ipfsHash = await uploadToIPFS(file, (progress) => {
-        console.log("Upload progress:", progress);
-        this.setState({ uploadProgress: progress });
-      });
-
-      this.setState({ certificate: ipfsHash, isUploading: false });
-      toast.success("Document uploaded to IPFS successfully!", { position: "top-right" });
-      console.log("IPFS upload complete, hash:", ipfsHash);
-
-      await this.newUpload(ipfsHash);
-
-    } catch (error) {
-      this.setState({ uploadError: "Failed to upload document to IPFS", isUploading: false });
-      toast.error("Failed to upload document to IPFS. Please try again.", { position: "top-right" });
-      console.error("IPFS upload failed:", error);
-    }
-  };
-
-  newUpload = async (ipfsHash) => {
-    // Hardcoded contract and institute addresses
-    const contractAddress = "0x1b9025C7081dA1eAb6e150c03e50C893115B0C12"; // Replace with the actual contract address
-    const instituteAddress = this.props.instituteAddress; // Assuming instituteAddress is still passed as a prop
-
-    if (!window.ethereum || !contractAddress || !instituteAddress) {
-      toast.error("Missing MetaMask or required address. Contact support.");
-      console.error("MetaMask not available or contract address not provided.");
-      return;
-    }
-
-    try {
-      // Request account access
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, ZCASUCertificate.abi, signer);
-
-      // Assuming registration fee is predefined
-      const registrationFee = ethers.parseEther("1.0"); // Replace with actual fee if dynamic
-
-      // Register the student and upload the certificate
-      const transaction = await contract.registerStudent(instituteAddress, { value: registrationFee });
-      console.log("Student registration transaction:", transaction);
-
-      const receipt = await transaction.wait();
-      console.log("Transaction receipt:", receipt);
-
-      toast.success("Student successfully registered and certificate uploaded.", { position: "top-right" });
-    } catch (error) {
-      toast.error("Failed to register student or upload certificate.", { position: "top-right" });
-      console.error("Blockchain submission failed:", error);
-    }
-  };
-
-  render() {
-    return (
-      <div className="my-documents-container">
-        <h2 className="section-title">My Documents</h2>
-        <p className="section-subtitle">(Click on the Document name to view)</p>
-
-        {this.state.documents.length > 0 ? (
-          this.state.documents.map((doc, index) => (
-            <div className="document-card" key={index}>
-              <div className="doc-info">
-                <Avatar style={{ backgroundColor: doc.status === 'Pending' ? red[500] : green[500] }}>
-                  <AssignmentIcon />
-                </Avatar>
-                <div className="doc-details">
-                  <h3>Document #{index + 1}</h3>
-                  <p>Status: {doc.status}</p>
-                </div>
-              </div>
-              <Button className="view-btn" onClick={() => this.getDoc(doc.hash)}>VIEW</Button>
-            </div>
-          ))
-        ) : (
-          <p>No documents uploaded yet.</p>
-        )}
-
-        <Button className="add-doc-btn" onClick={this.handleClickOpen}>ADD NEW DOCUMENT</Button>
-
-        <Dialog open={this.state.open} onClose={this.handleClose}>
-          <DialogTitle>Add New Document</DialogTitle>
-          <DialogContent>
-            <DialogContentText>Upload a Document</DialogContentText>
-            <input onChange={this.captureFile} type="file" />
-
-            {this.state.isUploading && (
-              <div style={{ marginTop: 20 }}>
-                <Typography>Uploading: {this.state.uploadProgress}%</Typography>
-                <LinearProgress variant="determinate" value={this.state.uploadProgress} />
-              </div>
-            )}
-
-            {this.state.uploadError && (
-              <Typography color="error" style={{ marginTop: 10 }}>{this.state.uploadError}</Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">Cancel</Button>
-            <Button onClick={() => this.newUpload(this.state.certificate)} color="primary" disabled={this.state.isUploading || !this.state.certificate}>Upload</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
-  }
-}
-
-export default MyDocuments;
-*/
-
-
-
-
 
 
 

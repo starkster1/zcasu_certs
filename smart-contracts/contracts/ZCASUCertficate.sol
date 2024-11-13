@@ -13,7 +13,6 @@ contract ZCASUCertificate {
     mapping(address => Certificate[]) public studentCertificates; // Maps each student to their certificates
     mapping(string => bool) public usedHashes; // Tracks used certificate IPFS hashes
     mapping(string => Certificate) private certificatesByHash; // Maps IPFS hash to certificate details
-    mapping(address => bool) public isRegisteredStudent; // Tracks registered students
 
     address public institute; // Institute address is set as the deployer
 
@@ -44,31 +43,22 @@ contract ZCASUCertificate {
         _;
     }
 
-    modifier onlyUnregisteredStudent() {
-        require(!isRegisteredStudent[msg.sender], "You are already registered as a student");
-        _;
-    }
-
-    function registerAsStudent() external onlyUnregisteredStudent {
-        isRegisteredStudent[msg.sender] = true;
-    }
-
-    function issueCertificate(string memory _ipfsHash) external onlyInstitute {
+    function issueCertificate(address student, string memory _ipfsHash) external onlyInstitute {
         require(!usedHashes[_ipfsHash], "Certificate hash already exists");
 
         Certificate memory newCertificate = Certificate({
             ipfsHash: _ipfsHash,
-            student: msg.sender,
+            student: student,
             institute: institute,
             timestamp: block.timestamp,
             isValid: true
         });
 
-        studentCertificates[msg.sender].push(newCertificate);
+        studentCertificates[student].push(newCertificate);
         certificatesByHash[_ipfsHash] = newCertificate;
         usedHashes[_ipfsHash] = true;
 
-        emit CertificateIssued(msg.sender, institute, _ipfsHash, block.timestamp);
+        emit CertificateIssued(student, institute, _ipfsHash, block.timestamp);
     }
 
     // Verifies the certificate by IPFS hash and sets its validity status
@@ -80,7 +70,6 @@ contract ZCASUCertificate {
         emit CertificateVerified(certificate.student, _ipfsHash, _isValid); // Emit event
     }
 
-
     function revokeCertificate(string memory _ipfsHash) external onlyInstitute {
         Certificate storage certificate = certificatesByHash[_ipfsHash];
         require(certificate.student != address(0), "Certificate not found");
@@ -88,7 +77,6 @@ contract ZCASUCertificate {
         certificate.isValid = false;
         emit CertificateRevoked(certificate.student, _ipfsHash);
     }
-
 
     function getCertificates(address _student) external view returns (Certificate[] memory) {
         return studentCertificates[_student];
@@ -98,5 +86,24 @@ contract ZCASUCertificate {
         Certificate storage certificate = certificatesByHash[_ipfsHash];
         require(certificate.student != address(0), "Certificate not found");
         return certificate;
+    }
+
+    // Registers a new certificate for a student
+    function registerCertificate(string memory _ipfsHash, address _institute) external {
+        require(!usedHashes[_ipfsHash], "Certificate hash already exists");
+
+        Certificate memory newCertificate = Certificate({
+            ipfsHash: _ipfsHash,
+            student: msg.sender,
+            institute: _institute,
+            timestamp: block.timestamp,
+            isValid: true
+        });
+
+        studentCertificates[msg.sender].push(newCertificate);
+        certificatesByHash[_ipfsHash] = newCertificate;
+        usedHashes[_ipfsHash] = true;
+
+        emit CertificateIssued(msg.sender, _institute, _ipfsHash, block.timestamp);
     }
 }

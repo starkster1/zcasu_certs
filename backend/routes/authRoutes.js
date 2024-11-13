@@ -108,26 +108,6 @@ const contractABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "name": "isRegisteredStudent",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       },
       {
         "internalType": "uint256",
@@ -188,14 +168,12 @@ const contractABI = [
     "constant": true
   },
   {
-    "inputs": [],
-    "name": "registerAsStudent",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "student",
+        "type": "address"
+      },
       {
         "internalType": "string",
         "name": "_ipfsHash",
@@ -331,9 +309,27 @@ const contractABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_institute",
+        "type": "address"
+      }
+    ],
+    "name": "registerCertificate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ];
-const contractAddress = '0x718E250168145e4EB7653d7775Ba439A598693e4'; // Replace with your contract address
+const contractAddress = '0xf085504Be507EC6E2805eD95963f7814104FA60a'; // Replace with your contract address
 
 // MetaMask verification utility function for admin
 const checkMetaMaskAdmin = async (ethAddress) => {

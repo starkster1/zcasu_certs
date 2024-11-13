@@ -5,14 +5,14 @@ import { FiSearch, FiLogOut } from "react-icons/fi";
 import { AiOutlineProfile, AiOutlineFileText, AiOutlineSetting } from "react-icons/ai";
 import { BsShieldLock, BsUnlock } from "react-icons/bs";
 import { Web3Provider } from "@ethersproject/providers";
-import { Contract } from "ethers";  // Updated import for Contract
+import { Contract } from "ethers"; 
 import DashboardContent from './components/DashboardContent';
 import ProfileSection from './components/ProfileSection';
 import MyDocuments from './components/MyDocuments';
 import GiveAccess from './components/ProfileSection';
 import Settings from './components/Settings';
 import Loading from '../../utils/Loading';
-import ZCASUCertificate from '../../contracts/ZCASUCertificate.json'; // Contract ABI
+import ZCASUCertificate from '../../contracts/ZCASUCertificate.json';
 import './StudentDashboard.css';
 
 const StudentDashboard = () => {
@@ -23,10 +23,13 @@ const StudentDashboard = () => {
   const [contract, setContract] = useState(null);   // Add state for contract
   const [accounts, setAccounts] = useState([]);     // Add state for accounts
   
-  const contractAddress = "0x718E250168145e4EB7653d7775Ba439A598693e4";
+  const contractAddress = "0xf085504Be507EC6E2805eD95963f7814104FA60a";
+  const instituteAddress = "0x1E72106F5935568E6489a5A42E5c3E71b58967f5";
+
 
   useEffect(() => {
     console.log("Certificate Contract Address:", contractAddress);
+    console.log("The institute Address:", instituteAddress);
 
     // Initialize the blockchain connection and contract
     const initializeBlockchainData = async () => {
@@ -121,7 +124,7 @@ const StudentDashboard = () => {
         return <DashboardContent userName={user.firstName} isWaving={isWaving} />;
       case 'My Documents':
         // Pass contract and accounts as props to MyDocuments
-        return <MyDocuments contractAddress={contractAddress} />;
+        return <MyDocuments contractAddress={contractAddress} instituteAddress={instituteAddress} />;
       case 'Profile':
         return <ProfileSection />;
       case 'Give Access':
@@ -185,5 +188,6 @@ const StudentDashboard = () => {
     </div>
   );
 };
+
 
 export default StudentDashboard;
