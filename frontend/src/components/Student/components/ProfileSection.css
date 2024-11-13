@@ -13,6 +13,12 @@ body {
     grid-template-columns: 1fr 2fr;
     gap: 16px;
   }
+  /* Additional styling for profile card content */
+.profile-card .relative {
+  text-align: center;
+  padding: 20px;
+}
+
   
   /* Left column (profile details) */
   .profile-card {
@@ -21,8 +27,35 @@ body {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     padding: 24px;
     text-align: center;
+    margin-left: -30px;
+    
   }
   
+  .profile-card, .detail-card {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    width: 300px;
+    padding-top: 10px;
+  }
+  
+  /* Purple ribbon for each card */
+  .ribbon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px; /* Adjust height as needed */
+    background-color: #395377; /* bg-purple-600 */
+    border-top-left-radius: 8px; /* Match card's border radius */
+    border-top-right-radius: 8px;
+  }
+  
+
+
+
   .profile-card img {
     width: 128px;
     height: 128px;
@@ -68,7 +101,7 @@ body {
     border-radius: 8px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     padding: 24px;
-    width: 100%;
+    width: 95%;
   }
   
   .detail-card h3 {

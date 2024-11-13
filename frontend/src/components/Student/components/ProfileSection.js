@@ -3,14 +3,14 @@ import { FiEdit2, FiMail, FiCreditCard, FiAward, FiUpload } from "react-icons/fi
 import { IoMdClose } from "react-icons/io";
 import './ProfileSection.css';
 import Loading from '../../../utils/Loading';
+import profImage from '../../../assets/prof.jpg';
 
 const ProfileSection = () => {
-  const [user, setUser] = useState(null); // Store user data
+  const [user, setUser] = useState(null);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  // Fetch user data
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -35,8 +35,7 @@ const ProfileSection = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched User Data:', data); // Log the response data
-        setUser(data); // Save user data
+        setUser(data);
       } else {
         console.error('Failed to fetch user data');
       }
@@ -46,16 +45,15 @@ const ProfileSection = () => {
   };
 
   useEffect(() => {
-    fetchUserData(); // Fetch data on component mount
+    fetchUserData();
   }, []);
 
-  // Utility function to format Ethereum address
   const formatEthereumAddress = (address) => {
     return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Address not available';
   };
 
   const handleEmailEdit = () => {
-    setNewEmail(user?.email || ""); // Set initial email from fetched user data
+    setNewEmail(user?.email || "");
     setIsEditingEmail(true);
   };
 
@@ -70,16 +68,18 @@ const ProfileSection = () => {
   };
 
   if (!user) {
-    return <Loading/>; // Display loading until user data is fetched
+    return <Loading />;
   }
 
   return (
     <div className="profile-container">
-      {/* Left column: Profile details */}
+      {/* Profile Card */}
       <div className="profile-card">
+        <div className="ribbon"></div> {/* Ribbon */}
+        
         <div className="relative">
           <img
-            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d"
+            src={profImage}
             alt="Profile"
             onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633332755192-727a05c4013d"; }}
           />
@@ -90,20 +90,18 @@ const ProfileSection = () => {
           >
             <FiEdit2 />
           </button>
-          
         </div>
         <h2 className="profile-name">{`${user?.firstName || ''} ${user?.lastName || ''}`}</h2>
-          <p className="profile-role">{user?.role || 'Role not available'}</p> 
-          <p className="profile-student-number">{user?.studentNumber || 'Student Number not available'}</p> 
-          <p className="profile-email">{user?.email || 'Email not available'}</p>
-          <p className="profile-ethereum-address">{formatEthereumAddress(user.ethereumAddress)}</p>
+        <p className="profile-role">{user?.role || 'Role not available'}</p>
+        <p className="profile-student-number">{user?.studentNumber || 'Student Number not available'}</p>
+        <p className="profile-email">{user?.email || 'Email not available'}</p>
+        <p className="profile-ethereum-address">{formatEthereumAddress(user.ethereumAddress)}</p>
       </div>
 
-      
-
-      {/* Right column: Email, transactions, and certificates */}
+      {/* Detail Card */}
       <div className="detail-card">
-        {/* Email Section */}
+        <div className="ribbon"></div> {/* Ribbon */}
+        
         <h3>
           <FiMail /> Email
         </h3>
@@ -127,7 +125,6 @@ const ProfileSection = () => {
           )}
         </div>
 
-        {/* Transactions Section */}
         <h3>
           <FiCreditCard /> Transactions
         </h3>
@@ -156,7 +153,6 @@ const ProfileSection = () => {
           </table>
         </div>
 
-        {/* Certificates Section */}
         <h3>
           <FiAward /> Certificates
         </h3>
@@ -169,7 +165,6 @@ const ProfileSection = () => {
             </div>
           ))}
         </div>
-        
       </div>
 
       {/* Modal for Profile Picture Upload */}
@@ -208,3 +203,4 @@ const ProfileSection = () => {
 };
 
 export default ProfileSection;
+

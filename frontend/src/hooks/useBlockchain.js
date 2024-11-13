@@ -74,8 +74,6 @@ export const useBlockchain = () => {
   };
 
 
-
-
   // Issue a certificate
   const issueCertificate = async (ipfsHash) => {
     try {
@@ -170,8 +168,6 @@ export const useBlockchain = () => {
     getCertificateDetails,
   };
 };
-
-
 
 
 
