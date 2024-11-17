@@ -11,7 +11,6 @@ const SignUpPage = ({ setUserProfile }) => {
     firstName: '',
     lastName: '',
     studentNumber: '',
-    email: '',
     ethereumAddress: account || '',
     password: ''  
   });
@@ -68,15 +67,6 @@ const SignUpPage = ({ setUserProfile }) => {
           delete newErrors[name];
         }
         break;
-      case 'email':
-        if (!value.trim()) {
-          newErrors[name] = 'Email is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          newErrors[name] = 'Invalid email format';
-        } else {
-          delete newErrors[name];
-        }
-        break;
       case 'password':
         const passwordError = validatePasswordStrength(value);
         if (passwordError) {
@@ -101,47 +91,61 @@ const SignUpPage = ({ setUserProfile }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!account) {
+      
       setMetaMaskError('MetaMask account not connected.');
       return;
     }
-
+  
     try {
-      const { firstName, lastName, studentNumber, email, password } = formData;
-
-      if (!firstName || !lastName || !studentNumber || !email || !password) {
+      const { firstName, lastName, studentNumber, password } = formData;
+  
+      // Log the form data and account before validation
+      console.log('Form Data before validation:', formData);
+      console.log('Ethereum Address from account:', account);
+  
+      if (!firstName || !lastName || !studentNumber || !password) {
         setMetaMaskError('Required fields are missing.');
         return;
       }
-
+  
+      // Log the data being sent to the server
+      const bodyData = {
+        firstName,
+        lastName,
+        studentNumber,
+        ethereumAddress: account.toLowerCase(),
+        password,
+        role: 'student',
+      };
+      console.log('Data to be sent:', bodyData);
+  
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          ethereumAddress: account.toLowerCase(),
-          role: 'student'
-        }),
+        body: JSON.stringify(bodyData),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
+        console.log('Registration Successful:', data);
         setSuccessMessage('Registration Successful! Redirecting to login...');
-        // Call connectWallet after successful registration to ensure wallet connection
-        await connectWallet();
+        await connectWallet(); // Ensure wallet connection after registration
         setTimeout(() => {
           setSuccessMessage('');
           navigate('/signin');
         }, 2000);
       } else {
-        console.error('Error:', data.message);
+        console.error('Registration Error:', data.message);
+        setMetaMaskError(data.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('Error during registration:', error);
       setMetaMaskError('Server error during registration. Please try again.');
     }
   };
+  
 
   // Handle navigation to the sign-in page
   const goToSignIn = () => {
@@ -219,23 +223,6 @@ const SignUpPage = ({ setUserProfile }) => {
                 placeholder="202100154"
               />
               {errors.studentNumber && <p className="text-red-500 text-xs italic">{errors.studentNumber}</p>}
-            </div>
-
-            {/* Email Field */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full py-2 px-3 border ${errors.email ? 'border-red-300' : ''} rounded-lg shadow-sm`}
-                placeholder="john.doe@example.com"
-              />
-              {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
             </div>
 
             {/* Password Field */}

@@ -1,23 +1,24 @@
 import { Bell, X, Mail } from 'lucide-react';
+import './NotificationDrawer.css';
 
 export default function NotificationDrawer({ isOpen, onClose, notifications, onMarkAsRead }) {
   return (
-    <div className={`fixed inset-y-0 right-0 w-96 bg-white shadow-xl transform ${isOpen ? 'drawer-open translate-x-0' : 'drawer-closed translate-x-full'} transition-transform duration-300 ease-in-out`}>
+    <div className={`drawer ${isOpen ? 'drawer-open' : 'drawer-closed'}`}>
       <div className="h-full flex flex-col">
-        <div className="px-4 py-6 bg-indigo-600">
+        <div className="drawer-header">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Notifications</h2>
+            <h2 className="drawer-header-title">Notifications</h2>
             <button onClick={onClose} className="text-white hover:text-gray-200">
               <X className="h-6 w-6" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="drawer-content">
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`p-4 rounded-lg ${notification.read ? 'bg-gray-50' : 'bg-indigo-50'} ${notification.read ? 'border-gray-200' : 'border-indigo-200'} border`}
+              className={`notification-item ${notification.read ? '' : 'notification-item-unread'}`}
             >
               <div className="flex items-start">
                 {notification.type === 'certificate' ? (
@@ -28,7 +29,7 @@ export default function NotificationDrawer({ isOpen, onClose, notifications, onM
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-medium text-gray-900">{notification.title}</p>
                   <p className="mt-1 text-sm text-gray-500">{notification.message}</p>
-                  <p className="mt-2 text-xs text-gray-400">
+                  <p className="notification-timestamp">
                     {new Date(notification.timestamp).toLocaleString()}
                   </p>
                 </div>

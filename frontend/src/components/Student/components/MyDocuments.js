@@ -10,13 +10,13 @@ import {
   Typography,
   Avatar
 } from '@mui/material';
-import { FileText } from 'lucide-react';
 import { uploadToIPFS } from '../../../utils/ipfs';
 import { toast } from 'react-toastify';
 import { useWallet } from '../../../contexts/WalletContext';
 import { useBlockchain } from '../../../hooks/useBlockchain';
 import profImage from '../../../assets/prof.jpg';
 import styles from './MyDocuments.module.css'; // Import the CSS module
+import {FiAward} from "react-icons/fi";
 
 const MyDocuments = ({ instituteAddress }) => {
   const { account, connectWallet } = useWallet();
@@ -130,8 +130,8 @@ const MyDocuments = ({ instituteAddress }) => {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">My Documents</h2>
-          <p className="text-gray-600">(Click on the Document name to view)</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-1">My Documents</h2>
+          <p className="text-gray-500 mt-0">(Click on the Document name to view)</p>
         </div>
         <div
           style={{
@@ -159,7 +159,6 @@ const MyDocuments = ({ instituteAddress }) => {
           />
         </div>
       </div>
-
       <div className="grid gap-4">
         {documents.length > 0 ? (
           documents.map((doc, index) => (
@@ -167,13 +166,18 @@ const MyDocuments = ({ instituteAddress }) => {
               <div className={styles.ribbon}></div> {/* Purple Ribbon */}
               <div className={styles.certificateContent}>
                 <Avatar className={`${doc.status === 'Pending' ? 'bg-yellow-500' : 'bg-green-500'}`}>
-                  <FileText className="h-5 w-5" />
+                  <FiAward className="h-5 w-5" />
                 </Avatar>
                 <div>
                   <h3 className="font-semibold">Certificate #{index + 1}</h3>
-                  <p className="text-sm text-gray-600">Status: {doc.status}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(doc.timestamp * 1000).toLocaleDateString()}
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-600">Status: {doc.status}</p>
+                    <p className="text-sm text-gray-600 text-right">
+                      Uploader: {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'N/A'}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Upload Date: {new Date(doc.timestamp * 1000).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -193,6 +197,7 @@ const MyDocuments = ({ instituteAddress }) => {
           </p>
         )}
       </div>
+
 
       <Button
         variant="contained"

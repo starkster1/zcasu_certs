@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MessageSquare, Send, X } from 'lucide-react';
+import './MessageDrawer.css';
 
 export default function MessageDrawer({ isOpen, onClose, messages, onSendMessage }) {
   const [newMessage, setNewMessage] = useState('');
@@ -12,28 +13,23 @@ export default function MessageDrawer({ isOpen, onClose, messages, onSendMessage
   };
 
   return (
-    <div className={`fixed inset-y-0 right-0 w-96 bg-white shadow-xl transform ${isOpen ? 'drawer-open translate-x-0' : 'drawer-closed translate-x-full'} transition-transform duration-300 ease-in-out`}>
+    <div className={`drawer ${isOpen ? 'drawer-open' : 'drawer-closed'}`}>
       <div className="h-full flex flex-col">
-        <div className="px-4 py-6 bg-indigo-600">
+        <div className="drawer-header">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Messages</h2>
+            <h2 className="drawer-header-title">Messages</h2>
             <button onClick={onClose} className="text-white hover:text-gray-200">
               <X className="h-6 w-6" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.isInstitute ? 'justify-start' : 'justify-end'}`}
-            >
-              <div className={`max-w-[80%] rounded-lg p-3 ${message.isInstitute ? 'bg-gray-100' : 'bg-indigo-600 text-white'}`}>
+        <div className="drawer-content">
+          {messages.map((message, index) => (
+            <div key={index} className={`message-container ${message.isInstitute ? 'is-institute' : ''}`}>
+              <div className={`message ${message.isInstitute ? 'message-received' : 'message-sent'}`}>
                 <p className="text-sm">{message.content}</p>
-                <p className="text-xs mt-1 opacity-70">
-                  {new Date(message.timestamp).toLocaleString()}
-                </p>
+                <p className="message-timestamp">{new Date(message.timestamp).toLocaleString()}</p>
               </div>
             </div>
           ))}

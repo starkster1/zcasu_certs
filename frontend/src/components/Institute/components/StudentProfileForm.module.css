@@ -1,0 +1,66 @@
+/* src/components/StudentProfileForm.module.css */
+.studentProfileForm {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns layout */
+  gap: 20px; /* Space between items in both rows and columns */
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGrid input,
+.formGrid select {
+  width: 100%;
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.formGrid label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Full width for the single-item row */
+.fullWidth {
+  grid-column: span 2;
+}
+
+/* Submit button styling */
+button[type="submit"] {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: rgb(176, 152, 16);
+}
+
+@media (max-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

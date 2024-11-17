@@ -26,8 +26,16 @@
 
 .certificateContent {
   display: flex;
-  align-items: center;
   padding-top: 1rem; /* Adjusted padding to avoid overlap with ribbon */
+  justify-content: space-between; /* This pushes the uploader to the far right */
+  align-items: center; /* Vertically aligns the items */
+}
+
+
+.certificate-item {
+  display: flex;
+  justify-content: space-between; /* This pushes the uploader to the far right */
+  align-items: center; /* Vertically aligns the items */
 }
 
 .viewButton {
@@ -35,4 +43,106 @@
   &:hover {
     background-color: #cb950c; /* hover:bg-blue-700 */
   }
+}
+
+
+/* Main Container Styling */
+.container {
+  padding: 1.5rem;
+  max-width: 40rem;
+  margin: auto;
+}
+
+/* Header styling */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: #777;
+}
+
+/* Profile Image Styling */
+.profileImageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 115px;
+  height: 115px;
+  border-radius: 50%;
+  background-color: #CFD8DC;
+  padding: 5px;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #fff;
+}
+
+/* Document List Styling */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+
+.certificateCard:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.certificateContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Status Indicator */
+.statusPending {
+  background-color: #FBC02D; /* Yellow for Pending */
+  color: white;
+  border-radius: 50%;
+}
+
+.statusVerified {
+  background-color: #4CAF50; /* Green for Verified */
+  color: white;
+  border-radius: 50%;
+}
+
+/* Uploading Dialog Progress Bar */
+.dialogProgress {
+  margin-top: 1rem;
+}
+
+.dialogError {
+  color: #d32f2f;
+  margin-top: 0.5rem;
+}
+
+/* Add Document Button Styling */
+.addDocumentButton {
+  margin-top: 1.5rem;
+  width: 100%;
+  background-color: #395377;
+  color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.addDocumentButton:hover {
+  background-color: #cb950c;
 }

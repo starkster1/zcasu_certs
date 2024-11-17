@@ -23,8 +23,8 @@ const StudentDashboard = () => {
   const [contract, setContract] = useState(null);   // Add state for contract
   const [accounts, setAccounts] = useState([]);     // Add state for accounts
   
-  const contractAddress = "0xf085504Be507EC6E2805eD95963f7814104FA60a";
-  const instituteAddress = "0x1E72106F5935568E6489a5A42E5c3E71b58967f5";
+  const contractAddress = "0x303C82A0B8dCb9113Dad47180806296ceE081b0c";
+  const instituteAddress = "0x4e590Dc11cE71637F5D525fe1d8768226ae8575E";
 
 
   useEffect(() => {
@@ -187,6 +187,7 @@ const StudentDashboard = () => {
       </main>
     </div>
   );
+  
 };
 
 
@@ -451,12 +452,4 @@ const StudentDashboard = () => {
   );
 };
 
-export default StudentDashboard;
-
-
-*/
-
-
-
-/*
-*/
+export default StudentDashboard;*/

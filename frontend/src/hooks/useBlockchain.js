@@ -44,35 +44,25 @@ export const useBlockchain = () => {
     }
   };
 
- 
+  // Register certificate with IPFS hash
   const registerCertificate = async (ipfsHash, instituteAddress) => {
     try {
       const contract = await getContract();
-      if (!contract) throw new Error('Please connect your wallet first');
+      if (!contract) throw new Error("Please connect your wallet first");
 
-      console.log('Registering certificate with:', { ipfsHash, instituteAddress });
-
-      // Send the transaction using the signer
+      console.log("Registering certificate with:", { ipfsHash, instituteAddress });
       const tx = await contract.registerCertificate(ipfsHash, instituteAddress);
-      toast.info('Registering certificate... Please wait for confirmation');
 
-      // Wait for the transaction to be mined and get the receipt
-      const receipt = await tx.wait();
-
-      // Check the receipt status; status === 1 indicates success
-      if (receipt.status === 1) {
-        toast.success('Certificate successfully registered on blockchain');
-        return true;
-      } else {
-        throw new Error("Transaction failed; it may have been reverted");
-      }
+      toast.info("Registering certificate... Please wait for confirmation");
+      await tx.wait();
+      toast.success("Certificate successfully registered on blockchain");
+      return true;
     } catch (error) {
-      console.error('Failed to register certificate:', error);
-      toast.error(error.message || 'Failed to register certificate');
+      console.error("Failed to register certificate:", error);
+      toast.error(error.message || "Failed to register certificate");
       return false;
     }
   };
-
 
   // Issue a certificate
   const issueCertificate = async (ipfsHash) => {

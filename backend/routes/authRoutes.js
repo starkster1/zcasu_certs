@@ -5,6 +5,7 @@ const Web3 = require('web3');
 const User = require('../models/user');
 const Admin = require('../models/admin');
 const router = express.Router();
+const StudentProfile = require('../models/StudentProfile');
 
 // Smart contract ABI and address (deployed on Ganache or another network)
 const contractABI = [
@@ -329,35 +330,48 @@ const contractABI = [
     "type": "function"
   }
 ];
-const contractAddress = '0xf085504Be507EC6E2805eD95963f7814104FA60a'; // Replace with your contract address
+const contractAddress = '0x303C82A0B8dCb9113Dad47180806296ceE081b0c'; // Replace with your contract address
 
 // MetaMask verification utility function for admin
 const checkMetaMaskAdmin = async (ethAddress) => {
-  const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');  // Connect to Ganache
+  if (!ethAddress) {
+    console.error("Ethereum address is null.");
+    throw new Error("Ethereum address is required for MetaMask admin check.");
+  }
+
+  const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');
   const contract = new web3.eth.Contract(contractABI, contractAddress);
-  const instituteAddress = await contract.methods.institute().call();
-
-  return ethAddress.toLowerCase() === instituteAddress.toLowerCase();  // Return true if MetaMask address matches the admin address
-};
-
-router.post('/login', async (req, res) => {
-  const { emailOrStudentNumber, password, ethAddress } = req.body;
 
   try {
-    console.log('Login request received:', { emailOrStudentNumber, ethAddress });
+    const instituteAddress = await contract.methods.institute().call();
+    return ethAddress.toLowerCase() === instituteAddress.toLowerCase();
+  } catch (error) {
+    console.error("Error calling contract method 'institute':", error);
+    throw new Error("Failed to verify MetaMask admin.");
+  }
+};
 
-    // 1. Try to find the user in the User collection (students)
-    let user = await User.findOne({
-      $or: [{ email: emailOrStudentNumber }, { studentNumber: emailOrStudentNumber }],
-    });
 
+router.post('/login', async (req, res) => {
+  const { studentNumber, password, ethAddress } = req.body;
+
+  try {
+    console.log('Login request received:', { studentNumber, ethAddress });
+
+    // Find the user by `studentNumber`
+    let user = await User.findOne({ studentNumber });
     if (user) {
-      console.log('Student found:', user);
+      console.log('Student found:', {
+        id: user._id,
+        role: user.role,
+        studentNumber: user.studentNumber, // Debug this value
+        ethereumAddress: user.ethereumAddress,
+      });
 
       // Compare password
       const isPasswordMatch = await bcrypt.compare(password, user.password);
       if (!isPasswordMatch) {
-        console.log('Password mismatch for user:', user.email);
+        console.log('Password mismatch for user:', user.studentNumber);
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
@@ -367,17 +381,30 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Ethereum address mismatch. Please use the registered MetaMask account.' });
       }
 
-      // Generate JWT token for student
+      // Generate JWT token for student, including `studentNumber`
       const jwtSecret = process.env.JWT_SECRET || 'default_secret';
-      const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret, { expiresIn: '1h' });
+      const token = jwt.sign(
+        {
+          id: user._id, 
+          role: user.role,
+          studentNumber: user.studentNumber,
+          ethereumAddress: user.ethereumAddress
+         },
+        jwtSecret,
+        { expiresIn: '1h' }
+      );
 
-      console.log('JWT generated for student:', { token, role: user.role });
+      console.log('JWT generated for student:', {
+        token,
+        role: user.role,
+        studentNumber: user.studentNumber,
+      });
 
-      return res.status(200).json({ token, user });  // Return user object with role
+      return res.status(200).json({ token, user });
     }
 
-    // 2. Try to find the user in the Admin collection
-    let admin = await Admin.findOne({ email: emailOrStudentNumber });
+    // Handle admin login
+    let admin = await Admin.findOne({ email: studentNumber }); // Admin login uses email
     if (admin) {
       console.log('Admin found:', admin);
 
@@ -396,93 +423,128 @@ router.post('/login', async (req, res) => {
 
       // Generate JWT token for admin
       const jwtSecret = process.env.JWT_SECRET || 'default_secret';
-      const token = jwt.sign({ id: admin._id, role: admin.role }, jwtSecret, { expiresIn: '1h' });
+      const token = jwt.sign(
+        { id: admin._id, role: admin.role, ethereumAddress: admin.ethereumAddress },
+        jwtSecret,
+        { expiresIn: '1h' }
+      );
 
-      console.log('JWT generated for admin:', { token, role: admin.role });
+      console.log('JWT generated for admin:', {
+        token,
+        role: admin.role,
+      });
 
-      return res.status(200).json({ token, user: admin });  // Return admin object with role
+      return res.status(200).json({ token, user: admin });
     }
 
-    // 3. If neither student nor admin is found, check if MetaMask address is an admin
-    const isMetaMaskAdmin = await checkMetaMaskAdmin(ethAddress); // Smart contract check
+    // Check if MetaMask address is an admin
+    const isMetaMaskAdmin = await checkMetaMaskAdmin(ethAddress);
     if (isMetaMaskAdmin) {
       console.log('MetaMask address is an admin:', ethAddress);
 
       // Register new admin in MongoDB
       const hashedPassword = await bcrypt.hash(password, 10);
-      admin = new Admin({ email: emailOrStudentNumber, password: hashedPassword, ethereumAddress: ethAddress, role: 'admin' });
-      await admin.save();
+      const newAdmin = new Admin({ email: studentNumber, password: hashedPassword, ethereumAddress: ethAddress, role: 'admin' });
+      await newAdmin.save();
 
       // Generate JWT token for new admin
       const jwtSecret = process.env.JWT_SECRET || 'default_secret';
-      const token = jwt.sign({ id: admin._id, role: 'admin' }, jwtSecret, { expiresIn: '1h' });
+      const token = jwt.sign(
+        { id: newAdmin._id, role: 'admin', ethereumAddress: newAdmin.ethereumAddress },
+        jwtSecret,
+        { expiresIn: '1h' }
+      );
 
-      console.log('New admin registered and JWT generated:', { token, role: 'admin' });
+      console.log('New admin registered and JWT generated:', {
+        token,
+        role: 'admin',
+      });
 
-      return res.status(201).json({ token, user: admin });  // Return new admin object with role
+      return res.status(201).json({ token, user: newAdmin });
     }
 
-    // 4. If no user or admin found, and MetaMask address is not admin
+    // If no user or admin found
     console.log('No user or admin found for the provided credentials');
     return res.status(404).json({ message: 'User not found' });
-
   } catch (error) {
     console.error('Error during login:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-
-// Registration route
 router.post('/register', async (req, res) => {
-  const { firstName, lastName, studentNumber, email, ethereumAddress, password, profilePicture, role } = req.body;
+  const { firstName, lastName, studentNumber, ethereumAddress, password, role } = req.body;
 
   try {
-      // Ensure all required fields are present
-      if (!firstName || !lastName || !studentNumber || !email || !password || !role) {
-          return res.status(400).json({ message: 'Missing required fields' });
-      }
+    // Ensure all required fields are present
+    console.log('Incoming registration data:', { firstName, lastName, studentNumber, ethereumAddress, role });
+    if (!firstName || !lastName || !studentNumber || !password || !role) {
+      console.error('Missing required fields during registration:', { firstName, lastName, studentNumber, role });
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
 
-      // Check if user already exists
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-          return res.status(400).json({ message: 'User already exists' });
-      }
+    // Check if user already exists
+    const existingUser = await User.findOne({ studentNumber });
+    if (existingUser) {
+      console.warn('User already exists with studentNumber:', studentNumber);
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create a new user with optional profilePicture and set the role (student)
-      const newUser = new User({
-          firstName,
-          lastName,
-          studentNumber,
-          email,
-          ethereumAddress,
-          password: hashedPassword,
-          role,  // Add role (student or admin)
-          profilePicture: profilePicture || '' // Default to an empty string if no picture provided
-      });
+    // Create a new user
+    const newUser = new User({
+      firstName,
+      lastName,
+      studentNumber,
+      ethereumAddress,
+      password: hashedPassword,
+      role,
+    });
 
-      // Save the user to MongoDB
-      await newUser.save();
+    // Save the user to MongoDB
+    await newUser.save();
 
-      // Generate JWT token
-      const jwtSecret = process.env.JWT_SECRET || 'default_secret';
-      const token = jwt.sign({ id: newUser._id }, jwtSecret, { expiresIn: '1h' });
+    console.log('New user successfully registered:', {
+      id: newUser._id,
+      studentNumber: newUser.studentNumber,
+      ethereumAddress: newUser.ethereumAddress,
+      role: newUser.role,
+    });
 
-      // Respond with the token and user details (excluding password)
-      res.status(201).json({
-          token,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          email: newUser.email,
-          ethereumAddress: newUser.ethereumAddress,
-          profilePicture: newUser.profilePicture
-      });
+    // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET || 'default_secret';
+    const token = jwt.sign(
+      {
+        id: newUser._id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        studentNumber: newUser.studentNumber,
+        ethereumAddress: newUser.ethereumAddress,
+      },
+      jwtSecret,
+      { expiresIn: '1h' }
+    );
+
+    console.log('JWT successfully generated for new user:', token);
+
+    res.status(201).json({
+      token,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      studentNumber: newUser.studentNumber,
+      ethereumAddress: newUser.ethereumAddress,
+    });
   } catch (error) {
-      console.error('Error during registration:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    // Detailed error logging
+    if (error.name === 'ValidationError') {
+      console.error('MongoDB Validation Error:', error.errors);
+    } else {
+      console.error('Unexpected Error:', error.message);
+    }
+
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 });
 
@@ -509,60 +571,115 @@ router.get('/check-registration', async (req, res) => {
 });
 
 
-// Middleware to authenticate the JWT token
 const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];  // Extract token from "Bearer <token>"
-  if (!token) return res.status(401).json({ message: 'Token missing' });
+  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from "Bearer <token>"
+  
+  if (!token) {
+    console.warn('Authorization header missing or malformed');
+    return res.status(401).json({ message: 'Access token is missing or invalid.' });
+  }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');  // Verify the token
-    req.userId = decoded.id;  // Attach user ID to request object
-    req.userRole = decoded.role;  // Attach user role to request object
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret'); // Verify the token
+    console.log('Decoded JWT payload:', decoded); // Debug decoded token
+    console.log('User ID:', decoded.id, 'Role:', decoded.role); // Debug user ID and role
+
+    // Validation for student role
+    if (decoded.role === 'student') {
+      console.log('Decoded student token:', {
+        id: decoded.id,
+        role: decoded.role,
+        studentNumber: decoded.studentNumber, // Check if this is populated
+      });
+
+      if (!decoded.studentNumber) {
+        console.error(`Invalid token: Missing studentNumber for role '${decoded.role}'`);
+        return res.status(403).json({ message: 'Invalid token: Missing studentNumber.' });
+      }
+    }
+
+    // Attach decoded information to request object
+    req.userId = decoded.id; // Attach user ID
+    req.userRole = decoded.role; // Attach user role
+    if (decoded.role === 'student') req.studentNumber = decoded.studentNumber; // Attach studentNumber for students
+
+    next(); // Proceed to the next middleware or route
   } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+    console.error('Token verification error:', error.message);
+    return res.status(403).json({ message: 'Invalid or expired token.' });
   }
 };
 
-// Route to fetch admin profile
-router.get('/admin-profile', authenticateToken, async (req, res) => {
+
+/*
+// Middleware to authenticate the JWT token
+const authenticateToken = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from "Bearer <token>"
+  if (!token) return res.status(401).json({ message: 'Token missing' });
+
   try {
-    if (req.userRole !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admins only.' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret'); // Verify the token
+    console.log('Decoded JWT payload:', decoded); // Debug decoded token
+    console.log('User ID:', decoded.id, 'Role:', decoded.role); // Debug user ID and role
+
+    // Validation for student role
+    if (decoded.role === 'student' && !decoded.studentNumber) {
+      console.error('Token missing studentNumber for student role');
+      return res.status(403).json({ message: 'Token missing required fields (studentNumber).' });
     }
 
-    const admin = await Admin.findById(req.userId).select('-password');  // Exclude the password field
-    if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
-    }
+    // Attach decoded information to request object
+    req.userId = decoded.id; // Attach user ID
+    req.userRole = decoded.role; // Attach user role
+    if (decoded.role === 'student') req.studentNumber = decoded.studentNumber; // Attach studentNumber for students
 
-    return res.status(200).json(admin);
+    next(); // Proceed to the next middleware or route
   } catch (error) {
-    console.error('Error fetching admin profile:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error('Token verification error:', error.message);
+    return res.status(403).json({ message: 'Invalid or expired token' });
   }
-});
+};
+*/
 
-// Route to fetch the user profile based on the token
+
 router.get('/user-profile', authenticateToken, async (req, res) => {
   try {
     let userProfile;
 
     if (req.userRole === 'student') {
-      userProfile = await User.findById(req.userId)
-        .select('firstName lastName email studentNumber role ethereumAddress profilePicture');
-      if (!userProfile) return res.status(404).json({ message: 'Student not found' });
+      // Fetch from StudentProfile based on studentNumber
+      console.log('Fetching profile for studentNumber:', req.studentNumber);
+      userProfile = await StudentProfile.findOne({ studentNumber: req.studentNumber }).select(
+        'firstName lastName email studentNumber program schoolOf startDate endDate duration accessLevel studyLevel profilePicture'
+      );
+      if (!userProfile) {
+        console.error(`Student profile not found for studentNumber: ${req.studentNumber}`);
+        return res.status(404).json({ message: 'Student profile not found' });
+      }
     } else if (req.userRole === 'admin') {
-      userProfile = await Admin.findById(req.userId)
-        .select('firstName lastName email role ethereumAddress profilePicture');
-      if (!userProfile) return res.status(404).json({ message: 'Admin not found' });
+      // Fetch from Admin collection
+      userProfile = await Admin.findById(req.userId).select(
+        'firstName lastName email role ethereumAddress profilePicture'
+      );
+      if (!userProfile) {
+        console.error(`Admin profile not found for ID: ${req.userId}`);
+        return res.status(404).json({ message: 'Admin profile not found' });
+      }
+    } else {
+      console.error(`Invalid role: ${req.userRole}`);
+      return res.status(400).json({ message: 'Invalid user role' });
     }
-    return res.status(200).json(userProfile);
+
+    return res.status(200).json({
+      role: req.userRole,
+      profile: userProfile,
+    });
   } catch (error) {
     console.error('Error fetching user profile:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 module.exports = router;

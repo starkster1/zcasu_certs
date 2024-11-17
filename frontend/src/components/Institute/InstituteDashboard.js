@@ -1,4 +1,145 @@
+// src/InstituteDashboard.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MdDashboard } from 'react-icons/md';
+import { FaBars, FaCogs, FaExchangeAlt, FaUserGraduate, FaUserShield, FaUserClock } from 'react-icons/fa';
+import { FiLogOut, FiAward } from 'react-icons/fi';
+import Dashboard from './components/Dashboard';
+import LinkedAccounts from './components/LinkedAccounts';
+import AccessRights from './components/AccessRights';
+import PendingApprovals from './components/PendingApprovals';
+import Profile from './components/Profile';
+import './dashboard.css';
+
+const InstituteDashboard = () => {
+  const [user, setUser] = useState(null);  // Logged-in admin user
+  const [students, setStudents] = useState([]);  // Real student data
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        navigate('/signin');
+        return;
+      }
+      try {
+        const response = await fetch('http://localhost:5000/api/admin-profile', {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+        } else {
+          navigate('/signin');
+        }
+      } catch (error) {
+        console.error('Error fetching admin data:', error);
+      }
+    };
+
+    const fetchStudents = async () => {
+      const token = localStorage.getItem('authToken');
+      try {
+        const response = await fetch('http://localhost:5000/api/students', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const studentData = await response.json();
+          setStudents(studentData);  // Set real student data here
+        }
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    };
+
+    fetchAdminData();
+    fetchStudents();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/signin');
+  };
+
+  
+  // If no user is set, show a loading screen
+  if (!user) {
+    return <div>Loading admin dashboard...</div>;
+  }
+
+  const sidebarItems = [
+    { id: 'dashboard', icon: <MdDashboard />, label: 'Dashboard' },
+    { id: 'linkedAccounts', icon: <FaUserGraduate />, label: 'Linked Accounts' },
+    { id: 'accessRights', icon: <FaUserShield />, label: 'Access Rights' },
+    { id: 'pendingApprovals', icon: <FaUserClock />, label: 'Pending Approvals' },
+    { id: 'profile', icon: <FaExchangeAlt />, label: 'Profile' },
+    { id: 'Settings', icon: <FaCogs />, label: 'Settings' },
+    { id: 'Logout', icon: <FiLogOut />, label: 'Logout', action: handleLogout },
+  ];
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'linkedAccounts':
+        return <LinkedAccounts students={students} />;
+      case 'accessRights':
+        return <AccessRights students={students} />;
+      case 'pendingApprovals':
+        return <PendingApprovals students={students} />;
+      case 'profile':
+        return <Profile students={students} />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-800">
+      <aside className={`bg-gray-800 text-white p-5 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} h-screen`}>
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => setIsCollapsed(!isCollapsed)} className="collapsible-button">
+            <FaBars size={24} />
+          </button>
+        </div>
+        <nav className="overflow-y-auto h-full">
+          <ul>
+            {sidebarItems.map((item) => (
+              <li key={item.id} className="mb-4">
+                <button
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center w-full p-1 rounded transition-colors ${activeTab === item.id ? 'bg-indigo-800' : 'hover:bg-gray-800'}`}
+                >
+                  <span className="mr-3 text-2xl">{item.icon}</span>
+                  {!isCollapsed && <span>{item.label}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+      <main className="flex-1 p-8 overflow-y-auto">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default InstituteDashboard;
+
+
+
+
+
+
+
+
+
+/*import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // For redirecting users
 import { FaUserGraduate, FaUserShield, FaUserClock, FaExchangeAlt, FaSearch, FaBars, FaCogs } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
@@ -114,10 +255,10 @@ const InstituteDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-800">
-      {/* Sidebar */}
+      
       <aside className={`bg-gray-800 text-white p-5 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} h-screen`}>
         <div className="flex items-center justify-between mb-8">
-          {/* Collapse button */}
+          
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="collapsible-button"
@@ -126,7 +267,7 @@ const InstituteDashboard = () => {
           </button>
         </div>
 
-        {/* Sidebar items */}
+       
         <nav className="overflow-y-auto h-full">
           <ul>
             {sidebarItems.map((item) => (
@@ -144,7 +285,7 @@ const InstituteDashboard = () => {
         </nav>
       </aside>
 
-      {/* Main content */}
+     
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
           {renderContent()}
@@ -273,7 +414,7 @@ const PendingApprovals = ({ students }) => (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Type</th>
-            {/* Make sure this is aligned to the right */}
+           
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
@@ -283,7 +424,7 @@ const PendingApprovals = ({ students }) => (
             <tr key={student.id}>
               <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
               <td className="px-6 py-4 whitespace-nowrap">Certificate Approval</td>
-              {/* Ensure buttons are aligned to the right */}
+             
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button className="bg-green-500 text-black px-3 py-1 rounded mr-2 hover:bg-green-600 transition-colors">
                   Approve
@@ -331,4 +472,4 @@ const ChangeInstitute = ({ students }) => (
   </div>
 );
 
-export default InstituteDashboard;
+export default InstituteDashboard;*/

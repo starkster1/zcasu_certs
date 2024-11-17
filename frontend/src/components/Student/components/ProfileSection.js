@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiEdit2, FiMail, FiCreditCard, FiAward, FiUpload } from "react-icons/fi";
+import { FiMail, FiUpload } from "react-icons/fi";
 import { IoMdClose } from "react-icons/io";
 import './ProfileSection.css';
 import Loading from '../../../utils/Loading';
@@ -7,8 +7,6 @@ import profImage from '../../../assets/prof.jpg';
 
 const ProfileSection = () => {
   const [user, setUser] = useState(null);
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const fetchUserData = async () => {
@@ -20,24 +18,23 @@ const ProfileSection = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/user-profile', {
+      const response = await fetch('http://localhost:5000/api/auth/user-profile', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      if (response.status === 401) {
-        console.error('Unauthorized, token might be invalid');
-        window.location.href = '/signup';
-        return;
-      }
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        console.log('User data fetched:', data);
+        setUser({
+          role: data.role,
+          ...data.profile,
+        });
       } else {
-        console.error('Failed to fetch user data');
+        const errorData = await response.json();
+        console.error('Failed to fetch user data:', errorData.message);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -52,17 +49,7 @@ const ProfileSection = () => {
     return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Address not available';
   };
 
-  const handleEmailEdit = () => {
-    setNewEmail(user?.email || "");
-    setIsEditingEmail(true);
-  };
-
-  const handleEmailSave = () => {
-    setUser((prevUser) => ({ ...prevUser, email: newEmail }));
-    setIsEditingEmail(false);
-  };
-
-  const handleImageUpload = (event) => {
+  const handleImageUpload = () => {
     console.log("Image upload triggered");
     setShowModal(false);
   };
@@ -76,98 +63,40 @@ const ProfileSection = () => {
       {/* Profile Card */}
       <div className="profile-card">
         <div className="ribbon"></div> {/* Ribbon */}
-        
-        <div className="relative">
-          <img
-            src={profImage}
-            alt="Profile"
-            onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633332755192-727a05c4013d"; }}
-          />
-          <button
-            onClick={() => setShowModal(true)}
-            className="edit-profile-picture-btn"
-            aria-label="Edit profile picture"
-          >
-            <FiEdit2 />
-          </button>
-        </div>
+        <img
+          src={profImage}
+          alt="Profile"
+          onError={(e) => {
+            e.target.src =
+              "https://images.unsplash.com/photo-1633332755192-727a05c4013d";
+          }}
+        />
         <h2 className="profile-name">{`${user?.firstName || ''} ${user?.lastName || ''}`}</h2>
-        <p className="profile-role">{user?.role || 'Role not available'}</p>
-        <p className="profile-student-number">{user?.studentNumber || 'Student Number not available'}</p>
-        <p className="profile-email">{user?.email || 'Email not available'}</p>
-        <p className="profile-ethereum-address">{formatEthereumAddress(user.ethereumAddress)}</p>
+        <p className="profile-role"><strong>Role:</strong> {user?.role || 'Role not available'}</p>
+        <p className="profile-student-number"><strong>Student Number:</strong> {user?.studentNumber || 'Student Number not available'}</p>
+        <p className="profile-email"><strong>Email:</strong> {user?.email || 'Email not available'}</p>
+        <p className="profile-ethereum-address">{formatEthereumAddress(user?.ethereumAddress)}</p>
       </div>
+
 
       {/* Detail Card */}
       <div className="detail-card">
         <div className="ribbon"></div> {/* Ribbon */}
-        
         <h3>
-          <FiMail /> Email
+          <FiMail /> Basic Information
         </h3>
-        <div className="email-field">
-          {isEditingEmail ? (
-            <div>
-              <input
-                type="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-              />
-              <button onClick={handleEmailSave} className="email-save-btn">Save</button>
-            </div>
-          ) : (
-            <span>{user.email}</span>
-          )}
-          {!isEditingEmail && (
-            <button onClick={handleEmailEdit} className="email-edit-btn">
-              <FiEdit2 />
-            </button>
-          )}
-        </div>
-
-        <h3>
-          <FiCreditCard /> Transactions
-        </h3>
-        <div className="transactions-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {user.transactions?.map((tx) => (
-                <tr key={tx.id}>
-                  <td>{tx.date}</td>
-                  <td>{tx.type}</td>
-                  <td>{tx.amount}</td>
-                  <td>
-                    <span className="status-completed">{tx.status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <h3>
-          <FiAward /> Certificates
-        </h3>
-        <div className="certificates-grid">
-          {user.certificates?.map((cert) => (
-            <div key={cert.id} className="certificate-item">
-              <h4>{cert.name}</h4>
-              <p>Issued by: {cert.issuer}</p>
-              <p>Date: {cert.issueDate}</p>
-            </div>
-          ))}
+        <div className="detail-content">
+          <p><strong>Program:</strong> {user?.program || 'N/A'}</p>
+          <p><strong>School Of:</strong> {user?.schoolOf || 'N/A'}</p>
+          <p><strong>Start Date:</strong> {user?.startDate || 'N/A'}</p>
+          <p><strong>End Date:</strong> {user?.endDate || 'N/A'}</p>
+          <p><strong>Duration:</strong> {user?.duration || 'N/A'}</p>
+          <p><strong>Access Level:</strong> {user?.accessLevel || 'N/A'}</p>
+          <p><strong>Study Level:</strong> {user?.studyLevel || 'N/A'}</p>
         </div>
       </div>
 
-      {/* Modal for Profile Picture Upload */}
+      {/* Modal for Image Upload */}
       {showModal && (
         <div className="modal-backdrop">
           <div className="modal-content">
@@ -203,4 +132,3 @@ const ProfileSection = () => {
 };
 
 export default ProfileSection;
-
