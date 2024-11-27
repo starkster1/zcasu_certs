@@ -13,7 +13,8 @@ import GiveAccess from './components/ProfileSection';
 import Settings from './components/Settings';
 import Loading from '../../utils/Loading';
 import ZCASUCertificate from '../../contracts/ZCASUCertificate.json';
-import './StudentDashboard.css';
+import NotificationAndMessageDrawer from '../../utils/NotificationAndMessageDrawer';
+import styles from './StudentDashboard.module.css';
 
 const StudentDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -22,9 +23,11 @@ const StudentDashboard = () => {
   const [user, setUser] = useState(null);
   const [contract, setContract] = useState(null);   // Add state for contract
   const [accounts, setAccounts] = useState([]);     // Add state for accounts
+  const [showNotifications, setShowNotifications] = useState(false); // State for Notification Drawer
+  const [showMessages, setShowMessages] = useState(false); // State for Message Drawer
   
-  const contractAddress = "0x303C82A0B8dCb9113Dad47180806296ceE081b0c";
-  const instituteAddress = "0x4e590Dc11cE71637F5D525fe1d8768226ae8575E";
+  const contractAddress = "0xA3F0BcFb81653415c266F878d575d461D01a7E7c";
+  const instituteAddress = "0x6a6b43df7Af22B3a6DdA31bB4ECb23024aA7f227";
 
 
   useEffect(() => {
@@ -76,7 +79,7 @@ const StudentDashboard = () => {
           return;
         }
   
-        const response = await fetch('http://localhost:5000/api/user-profile', {
+        const response = await fetch('http://localhost:5000/api/auth/user-profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -137,32 +140,31 @@ const StudentDashboard = () => {
   };
 
   const SidebarItem = ({ icon, text, section }) => (
-    <div className="sidebar-item mb-2">
+    <div className={styles.sidebarItem}>
       <button
         onClick={() => setSelectedSection(section)}
-        className={`sidebar-btn flex items-center justify-center w-full p-2 rounded-lg hover:bg-gray-700 transition-colors ${selectedSection === section ? 'active' : ''}`}
+        className={`${styles.sidebarBtn} ${selectedSection === section ? styles.active : ''}`}
       >
-        <div className="icon-container" style={{ fontSize: '24px' }}>
-          {icon}
-        </div>
-        {isSidebarOpen && <span className="ml-3">{text}</span>}
+        <div className={styles.iconContainer}>{icon}</div>
+        {isSidebarOpen && <span>{text}</span>}
       </button>
     </div>
   );
-  
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <aside className={`sidebar ${isSidebarOpen ? "w-64" : "w-20"} transition-all`}>
-        <div className="flex justify-between items-center mb-6">
-          {isSidebarOpen && <h2 className="dashboard-title">ZCAS University</h2>}
-          <button onClick={toggleSidebar} className="toggle-sidebar-btn">
-            <FaBars className={`transform ${isSidebarOpen ? "rotate-180" : ""}`} />
+    <div className={styles.dashboardContainer}>
+      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.expanded : styles.collapsed}`}>
+        <div className={styles.sidebarHeader}>
+          {isSidebarOpen && <h2 className={styles.dashboardTitle}>ZCAS University</h2>}
+          <button onClick={toggleSidebar} className={styles.toggleSidebarBtn}>
+            <FaBars className={`${isSidebarOpen ? styles.rotate180 : ''}`} />
+            
           </button>
         </div>
 
         <nav>
           <SidebarItem icon={<MdDashboard />} text="Dashboard" section="Dashboard" />
-          <SidebarItem icon={<AiOutlineProfile />} text="Personal Information" section="Profile" />
+          <SidebarItem icon={<AiOutlineProfile />} text="Profile" section="Profile" />
           <SidebarItem icon={<AiOutlineFileText />} text="My Documents" section="My Documents" />
           <SidebarItem icon={<BsShieldLock />} text="Give Access" section="Give Access" />
           <SidebarItem icon={<BsUnlock />} text="Free Access" section="Free Access" />
@@ -171,30 +173,30 @@ const StudentDashboard = () => {
         </nav>
       </aside>
 
-      <main className="main-content">
-        <header className="header">
-          <div className="header-content">
-            <div className="search-bar">
-              <input type="text" placeholder="Search..." className="search-input" />
-              <FiSearch className="search-icon" />
-            </div>
+      <main className={styles.mainContent}>
+        <header className={styles.header}>
+          <div className={styles.searchBar}>
+            <input type="text" placeholder="Search..." className={styles.searchInput} />
+            <FiSearch className={styles.searchIcon} />
           </div>
-        </header>
 
-        <div className="dashboard-scrollable-content">
-          {renderContent()}
-        </div>
+           {/* Notification and Message Drawers */}
+           <NotificationAndMessageDrawer
+              showNotifications={showNotifications}
+              showMessages={showMessages}
+              onClose={() => {
+                setShowNotifications(false);
+                setShowMessages(false);
+              }}
+            />
+        </header>
+        <div className={styles.dashboardScrollableContent}>{renderContent()}</div>
       </main>
     </div>
   );
-  
 };
 
-
 export default StudentDashboard;
-
-
-
 
 
 

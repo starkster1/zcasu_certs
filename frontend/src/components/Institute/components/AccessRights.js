@@ -1,5 +1,49 @@
 // src/components/AccessRights/AccessRights.js
 import React from 'react';
+import styles from './AccessRights.module.css';
+
+const AccessRights = ({ students }) => (
+  <div className={styles.container}>
+    <h2 className={styles.title}>Access Rights</h2>
+    <div className={styles.card}>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th className={styles.tableHeader}>Student Number</th>
+            <th className={styles.tableHeader}>Name</th>
+            <th className={styles.tableHeader}>Access Level</th>
+            <th className={styles.tableHeaderActions}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => (
+            <tr key={student.id} className={styles.tableRow}>
+              <td className={styles.tableCell}>{student.studentNumber}</td>
+              <td className={styles.tableCell}>{student.name}</td>
+              <td className={styles.tableCell}>View Certificates</td>
+              <td className={styles.tableCellActions}>
+                <button className={`${styles.actionButton} ${styles.modifyButton}`}>
+                  Modify
+                </button>
+                <button className={`${styles.actionButton} ${styles.revokeButton}`}>
+                  Revoke
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+export default AccessRights;
+
+
+
+
+/*// src/components/AccessRights/AccessRights.js
+import React from 'react';
 
 const AccessRights = ({ students }) => (
   <div>
@@ -31,3 +75,4 @@ const AccessRights = ({ students }) => (
 );
 
 export default AccessRights;
+*/

@@ -330,7 +330,7 @@ const contractABI = [
     "type": "function"
   }
 ];
-const contractAddress = '0x303C82A0B8dCb9113Dad47180806296ceE081b0c'; // Replace with your contract address
+const contractAddress = '0xA3F0BcFb81653415c266F878d575d461D01a7E7c'; // Replace with your contract address
 
 // MetaMask verification utility function for admin
 const checkMetaMaskAdmin = async (ethAddress) => {
@@ -396,6 +396,7 @@ router.post('/login', async (req, res) => {
 
       console.log('JWT generated for student:', {
         token,
+        id: user._id,
         role: user.role,
         studentNumber: user.studentNumber,
       });
@@ -522,6 +523,7 @@ router.post('/register', async (req, res) => {
         lastName: newUser.lastName,
         studentNumber: newUser.studentNumber,
         ethereumAddress: newUser.ethereumAddress,
+        role: newUser.role,
       },
       jwtSecret,
       { expiresIn: '1h' }
@@ -571,75 +573,50 @@ router.get('/check-registration', async (req, res) => {
 });
 
 
+
 const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from "Bearer <token>"
+  const authHeader = req.header('Authorization');
   
-  if (!token) {
-    console.warn('Authorization header missing or malformed');
+  // Validate that the Authorization header exists and starts with "Bearer "
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Access token is missing or invalid.' });
   }
 
+  const token = authHeader.split(' ')[1]; // Extract the token part
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret'); // Verify the token
-    console.log('Decoded JWT payload:', decoded); // Debug decoded token
-    console.log('User ID:', decoded.id, 'Role:', decoded.role); // Debug user ID and role
+    console.log(`[AUTH] Decoded JWT payload:`, decoded);
 
-    // Validation for student role
-    if (decoded.role === 'student') {
-      console.log('Decoded student token:', {
-        id: decoded.id,
-        role: decoded.role,
-        studentNumber: decoded.studentNumber, // Check if this is populated
-      });
-
-      if (!decoded.studentNumber) {
-        console.error(`Invalid token: Missing studentNumber for role '${decoded.role}'`);
-        return res.status(403).json({ message: 'Invalid token: Missing studentNumber.' });
-      }
+    // Validate required fields in the decoded token
+    if (!decoded.id || !decoded.role) {
+      return res.status(403).json({ message: 'Invalid token: Missing required fields.' });
     }
 
-    // Attach decoded information to request object
-    req.userId = decoded.id; // Attach user ID
-    req.userRole = decoded.role; // Attach user role
-    if (decoded.role === 'student') req.studentNumber = decoded.studentNumber; // Attach studentNumber for students
+    // Attach the required fields to the `req` object
+    req.userId = decoded.id; // User ID
+    req.userRole = decoded.role; // Role (e.g., student or admin)
 
-    next(); // Proceed to the next middleware or route
+    // Additional checks for student-specific fields
+    if (decoded.role === 'student') {
+      if (!decoded.studentNumber) {
+        return res.status(403).json({ message: 'Invalid token: Missing student number for student role.' });
+      }
+      req.studentNumber = decoded.studentNumber; // Attach student number for students
+    }
+
+    console.log('[AUTH] Attached to req:', {
+      userId: req.userId,
+      userRole: req.userRole,
+      studentNumber: req.studentNumber || null, // Null for non-students
+    });
+
+    next(); // Move to the next middleware or route handler
   } catch (error) {
-    console.error('Token verification error:', error.message);
+    console.error(`[AUTH] Token verification error: ${error.message}`);
     return res.status(403).json({ message: 'Invalid or expired token.' });
   }
 };
-
-
-/*
-// Middleware to authenticate the JWT token
-const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from "Bearer <token>"
-  if (!token) return res.status(401).json({ message: 'Token missing' });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret'); // Verify the token
-    console.log('Decoded JWT payload:', decoded); // Debug decoded token
-    console.log('User ID:', decoded.id, 'Role:', decoded.role); // Debug user ID and role
-
-    // Validation for student role
-    if (decoded.role === 'student' && !decoded.studentNumber) {
-      console.error('Token missing studentNumber for student role');
-      return res.status(403).json({ message: 'Token missing required fields (studentNumber).' });
-    }
-
-    // Attach decoded information to request object
-    req.userId = decoded.id; // Attach user ID
-    req.userRole = decoded.role; // Attach user role
-    if (decoded.role === 'student') req.studentNumber = decoded.studentNumber; // Attach studentNumber for students
-
-    next(); // Proceed to the next middleware or route
-  } catch (error) {
-    console.error('Token verification error:', error.message);
-    return res.status(403).json({ message: 'Invalid or expired token' });
-  }
-};
-*/
 
 
 router.get('/user-profile', authenticateToken, async (req, res) => {
@@ -681,6 +658,20 @@ router.get('/user-profile', authenticateToken, async (req, res) => {
 });
 
 
-
 module.exports = router;
 
+
+
+router.get('/ethereum-address', authenticateToken, async (req, res) => {
+  try {
+    if (!req.ethereumAddress) {
+      console.error('Ethereum address not found in token');
+      return res.status(404).json({ message: 'Ethereum address not available' });
+    }
+
+    return res.status(200).json({ ethereumAddress: req.ethereumAddress });
+  } catch (error) {
+    console.error('Error fetching Ethereum address:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});

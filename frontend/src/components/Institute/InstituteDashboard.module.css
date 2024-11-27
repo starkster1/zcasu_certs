@@ -1,0 +1,91 @@
+/* Sidebar Styles */
+.sidebar {
+  background-color: #2d2d2d;
+  color: white;
+  width: 260px;
+  transition: width 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 20px;
+}
+
+.sidebar button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sidebar button:hover {
+  background-color: #404040;
+}
+
+.sidebar button.active {
+  background-color: #4c4c4c;
+}
+
+.sidebar .icon {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+/* Header Styles */
+.header {
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 5px 10px;
+  width: 250px;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: none;
+  flex: 1;
+}
+
+.headerIcons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.headerIcon {
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+/* Main Content */
+.mainContent {
+  padding: 20px;
+  overflow-y: auto;
+}

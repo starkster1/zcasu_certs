@@ -43,6 +43,7 @@ export const useBlockchain = () => {
       return false;
     }
   };
+  
 
   // Register certificate with IPFS hash
   const registerCertificate = async (ipfsHash, instituteAddress) => {

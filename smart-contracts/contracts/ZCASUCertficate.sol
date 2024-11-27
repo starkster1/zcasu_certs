@@ -97,7 +97,7 @@ contract ZCASUCertificate {
             student: msg.sender,
             institute: _institute,
             timestamp: block.timestamp,
-            isValid: true
+            isValid: false
         });
 
         studentCertificates[msg.sender].push(newCertificate);

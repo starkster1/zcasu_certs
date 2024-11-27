@@ -19,11 +19,11 @@ const studentProfileContract = new web3.eth.Contract(
 
 // Register user and create blockchain profile
 router.post('/register', async (req, res) => {
-  const { firstName, lastName, studentNumber, email, ethereumAddress } = req.body;
+  const { firstName, lastName, studentNumber, ethereumAddress } = req.body;
 
   try {
     // Step 1: Save user data in MongoDB
-    const newUser = new UserModel({ firstName, lastName, studentNumber, email, ethereumAddress });
+    const newUser = new UserModel({ firstName, lastName, studentNumber, ethereumAddress });
     await newUser.save();
 
     // Step 2: Interact with Ethereum blockchain to create the profile
@@ -35,7 +35,6 @@ router.post('/register', async (req, res) => {
       await studentProfileContract.methods
         .createProfile(
           `${firstName} ${lastName}`,
-          email,
           studentNumber,
           ''  // Optional field for profile picture IPFS hash or additional data
         )

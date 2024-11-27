@@ -1,0 +1,91 @@
+/* src/components/AccessRights/AccessRights.module.css */
+
+.container {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    width:100%;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem; 
+    width: 100%;
+    
+  }
+  
+  .card {
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    text-transform: uppercase;
+
+  }
+  
+  .tableHeader {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    background-color: #f1f5f9;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    background-color: #4a5568; /* Gray-700 */
+  }
+  
+  .tableHeaderActions {
+    text-align: right;
+    padding-right: 1rem;
+  }
+  
+  .tableRow:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  
+  .tableCell {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #374151;
+  }
+  
+  .tableCellActions {
+    text-align: right;
+    padding-right: 1rem;
+  }
+  
+  .actionButton {
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .modifyButton {
+    background-color: #4f46e5;
+    color: white;
+    margin-right: 0.5rem;
+  }
+  
+  .modifyButton:hover {
+    background-color: #4338ca;
+    transform: scale(1.05);
+  }
+  
+  .revokeButton {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  .revokeButton:hover {
+    background-color: #b91c1c;
+    transform: scale(1.05);
+  }
+  

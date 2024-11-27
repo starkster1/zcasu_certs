@@ -108,20 +108,73 @@ const MyDocuments = ({ instituteAddress }) => {
       console.error("IPFS upload failed:", error);
     }
   };
-
   const newUpload = async (ipfsHash) => {
     if (!account) {
       toast.error("Please connect your wallet first");
       return;
     }
-    const success = await registerCertificate(ipfsHash, instituteAddress);
-    if (success) {
-      toast.success("Certificate successfully registered on blockchain!");
+  
+    const studentNumber = localStorage.getItem('studentNumber');
+    if (!studentNumber) {
+      toast.error("Missing studentNumber. Please log in again.");
+      return;
+    }
+  
+    const payload = {
+      studentNumber,
+      institute: instituteAddress,
+      ipfsHash,
+      metadata: {
+        documentType: "Certificate", // Example: Static or dynamic value
+        description: "Uploaded by student for approval",
+      },
+    };
+  
+    console.log('Submitting certificate request:', payload);
+  
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('Authorization token is missing. Please log in again.');
+      }
+  
+      // Send the certificate request to the server
+      const response = await fetch('http://localhost:5000/api/certificate-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        console.error("Response error:", data);
+        throw new Error(data.message || 'Failed to create certificate request.');
+      }
+  
+      console.log('Certificate request created successfully:', data);
+      toast.success("Certificate request successfully sent for approval!");
+  
+      // Register the certificate on the blockchain
+      const success = await registerCertificate(ipfsHash, instituteAddress);
+      if (success) {
+        toast.success("Certificate successfully registered on the blockchain!");
+      } else {
+        throw new Error("Blockchain registration failed.");
+      }
+  
+      // Reload documents and close the dialog
       handleClose();
       loadDocuments();
+    } catch (error) {
+      console.error("Error creating certificate request:", error.message);
+      toast.error(`Failed to create certificate request. ${error.message}`);
     }
   };
-
+  
   const getDoc = (hash) => {
     window.open(`https://gateway.pinata.cloud/ipfs/${hash}`, '_blank');
   };
@@ -163,7 +216,7 @@ const MyDocuments = ({ instituteAddress }) => {
         {documents.length > 0 ? (
           documents.map((doc, index) => (
             <div key={index} className={styles.certificateCard}>
-              <div className={styles.ribbon}></div> {/* Purple Ribbon */}
+              <div className={styles.ribbon}></div> 
               <div className={styles.certificateContent}>
                 <Avatar className={`${doc.status === 'Pending' ? 'bg-yellow-500' : 'bg-green-500'}`}>
                   <FiAward className="h-5 w-5" />
@@ -250,8 +303,6 @@ const MyDocuments = ({ instituteAddress }) => {
 };
 
 export default MyDocuments;
-
-
 
 
 /*

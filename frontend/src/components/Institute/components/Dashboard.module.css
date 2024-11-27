@@ -1,0 +1,90 @@
+/* General Styles for Dashboard */
+.dashboard {
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  width:98%;
+}
+
+.header {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+/* Grid Layout for Cards */
+.cardGrid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.cardGrid.mdGrid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.cardGrid.lgGrid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Styles for Pending Certificate Approvals Section */
+.approvalsSection {
+  margin-top: 2rem;
+}
+
+.sectionHeader {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.totalApprovals {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.pendingRequests {
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.requestItem {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.requestItem:last-child {
+  border-bottom: none;
+}
+
+.requestField {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.requestField strong {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Loading and Error Messages */
+.loadingMessage {
+  text-align: center;
+  font-size: 1rem;
+  color: #888;
+}
+
+.errorMessage {
+  text-align: center;
+  font-size: 1rem;
+  color: #e63946;
+}
+
+

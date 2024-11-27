@@ -1,0 +1,142 @@
+.container {
+    position: relative;
+  }
+  
+  .headerButtons {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .iconButton {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: gray;
+    transition: color 0.3s;
+  }
+  
+  .iconButton:hover {
+    color: blue;
+  }
+  
+  .notificationBadge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    font-size: 0.8rem;
+    border-radius: 50%;
+    height: 1.5rem;
+    width: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 80%;
+    width: 90%;
+    max-width: 23rem;
+    background: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 50;
+  }
+  
+  .openDrawer {
+    transform: translateX(0);
+  }
+  
+  .closedDrawer {
+    transform: translateX(100%);
+  }
+  
+  .drawerHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    height:45px;
+  }
+  
+  .clearButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: red;
+    transition: color 0.3s;
+  }
+  
+  .clearButton:hover {
+    color: darkred;
+  }
+  
+  .drawerContent {
+    overflow-y: auto;
+    height: calc(100% - 10rem);
+    padding: 1rem;
+  }
+  
+  .notificationItem, .messageItem {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    background: #fff;
+    transition: background 0.3s;
+  }
+  
+  .notificationItem:hover, .messageItem:hover {
+    background: #f9f9f9;
+  }
+  
+  .read {
+    background: #f0f0f0;
+  }
+  
+  .messageDetails {
+    margin-left: 1rem;
+  }
+  
+  .messageHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+  }
+  
+  .avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+  }
+  
+  .replyButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: blue;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  
+  .replyButton:hover {
+    color: darkblue;
+  }
+  
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+  

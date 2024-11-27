@@ -1,5 +1,4 @@
 // SignIn.js
-// SignIn.js
 
 import React, { useState } from 'react';
 import { FaEthereum } from 'react-icons/fa';
@@ -25,35 +24,37 @@ const SignIn = ({ setUserProfile }) => {
     e.preventDefault();
     setErrorMessage('');
     setIsLoading(true);
-
+  
     try {
       if (!isConnected) {
         await connectWallet();
       }
-
+  
       if (!studentNumber || !password) {
         setErrors({
-          studentNumber: !studentNumber ? 'Student Number is required' : '', // Updated error message
+          studentNumber: !studentNumber ? 'Student Number is required' : '',
           password: !password ? 'Password is required' : '',
         });
         setIsLoading(false);
         return;
       }
-
+  
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentNumber, password, ethAddress: account, rememberMe }), // Updated API payload
+        body: JSON.stringify({ studentNumber, password, ethAddress: account }),
       });
-
+  
       const data = await response.json();
+  
       if (response.ok) {
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userRole', data.user.role);
-        console.log('Token saved:', data.token); // Debug log
-
+        localStorage.setItem('authToken', data.token); // Store JWT token
+        localStorage.setItem('studentNumber', data.user.studentNumber); // Store studentNumber
+        localStorage.setItem('userRole', data.user.role); // Store user role
+        console.log('Token and studentNumber saved:', { token: data.token, studentNumber: data.user.studentNumber });
+  
         setUserProfile(data.user);
-
+  
         if (data.user.role === 'admin') navigate('/admin/dashboard');
         else if (data.user.role === 'student') navigate('/dashboard');
         else setErrorMessage('Invalid role detected. Please try again.');
@@ -66,6 +67,7 @@ const SignIn = ({ setUserProfile }) => {
       setIsLoading(false);
     }
   };
+  
 
   const goToSignUp = () => {
     navigate('/signup');

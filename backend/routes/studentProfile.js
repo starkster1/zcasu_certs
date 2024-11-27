@@ -122,6 +122,21 @@ router.get('/fetchProfile/:studentNumber', async (req, res) => {
 });
 
 
+// Fetch all student profiles
+router.get('/fetchAllProfiles', async (req, res) => {
+  try {
+    const studentProfiles = await StudentProfile.find();
+    if (!studentProfiles.length) {
+      return res.status(404).json({ message: 'No student profiles found.' });
+    }
+    res.status(200).json({ students: studentProfiles });
+  } catch (error) {
+    console.error('Error fetching student profiles:', error);
+    res.status(500).json({ error: 'Failed to fetch student profiles' });
+  }
+});
+
+
 module.exports = router;
 
 

@@ -1,6 +1,7 @@
 /* Base styling */
 body {
     background-color: #f8f9fa;
+
     font-family: Arial, sans-serif;
   }
   
@@ -13,13 +14,13 @@ body {
     grid-template-columns: 1fr 2fr;
     gap: 16px;
   }
-  /* Additional styling for profile card content */
-.profile-card .relative {
-  text-align: center;
-  padding: 20px;
-}
+      /* Additional styling for profile card content */
+    .profile-card .relative {
+      text-align: center;
+      padding: 20px;
+    }
 
-  
+      
   /* Left column (profile details) */
   .profile-card {
     background-color: #ffffff;
@@ -63,12 +64,16 @@ body {
     border-radius: 50%;
     margin: 0 auto 16px;
     display: block;
+    object-fit: cover; /* Ensure the image fits within the circular frame */
+    margin-top:40px;
   }
   
   .profile-name {
     font-size: 24px;
     font-weight: 700;
     color: #333;
+    text-align: center;
+    
   }
   
   .profile-role,
@@ -79,6 +84,49 @@ body {
     margin: 4px 0;
   }
   
+  .profile-card h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .profile-card p {
+    font-size: 1rem;
+    color: #333; /* Slightly dark text color for contrast */
+  }
+
+
+  /* Profile Icon Styling */
+.profile-icon {
+  color: gray; /* Change icon color to gray */
+  margin-right: 8px; /* Add some space between the icon and the text */
+  vertical-align: middle; /* Align icon with text */
+}
+
+/* Align all text and icons to the left */
+.profile-card p, .profile-card h2 {
+  display: flex;
+  align-items: center; /* Vertically align icons and text */
+  justify-content: flex-start; /* Align items to the left */
+  margin: 8px 0; /* Add some spacing between items */
+}
+
+/* Optional: Profile Card specific styling for better layout */
+.profile-card {
+  padding: 16px;
+  background-color: #f9f9f9; /* Light background for the card */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  text-align: center; /* Ensure everything is aligned to the left */
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center; /* Center-align the name text */
+  margin: 8px 0;
+}
+
+
   /* Edit button on profile picture */
   .edit-profile-picture-btn {
     position: absolute;
@@ -237,3 +285,11 @@ body {
     background-color: #0056b3;
   }
   
+  .icon-gray {
+    color: gray;
+  }
+
+  
+  .detail-content{
+    margin-top:30px;
+  }

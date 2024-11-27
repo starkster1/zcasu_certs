@@ -1,21 +1,24 @@
-// src/InstituteDashboard.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdDashboard } from 'react-icons/md';
 import { FaBars, FaCogs, FaExchangeAlt, FaUserGraduate, FaUserShield, FaUserClock } from 'react-icons/fa';
-import { FiLogOut, FiAward } from 'react-icons/fi';
+import { FiMessageSquare, FiLogOut, FiAward, FiSearch, FiBell } from 'react-icons/fi'; // Chat and Notification icons
 import Dashboard from './components/Dashboard';
 import LinkedAccounts from './components/LinkedAccounts';
 import AccessRights from './components/AccessRights';
 import PendingApprovals from './components/PendingApprovals';
 import Profile from './components/Profile';
+import NotificationAndMessageDrawer from '../../utils/NotificationAndMessageDrawer';
 import './dashboard.css';
 
 const InstituteDashboard = () => {
-  const [user, setUser] = useState(null);  // Logged-in admin user
-  const [students, setStudents] = useState([]);  // Real student data
+  const [user, setUser] = useState(null); // Logged-in admin user
+  const [students, setStudents] = useState([]); // Real student data
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false); // State for Notification Drawer
+  const [showMessages, setShowMessages] = useState(false); // State for Message Drawer
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +31,7 @@ const InstituteDashboard = () => {
       try {
         const response = await fetch('http://localhost:5000/api/admin-profile', {
           method: 'GET',
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
           const data = await response.json();
@@ -45,11 +48,11 @@ const InstituteDashboard = () => {
       const token = localStorage.getItem('authToken');
       try {
         const response = await fetch('http://localhost:5000/api/students', {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
           const studentData = await response.json();
-          setStudents(studentData);  // Set real student data here
+          setStudents(studentData); // Set real student data here
         }
       } catch (error) {
         console.error('Error fetching students:', error);
@@ -65,7 +68,6 @@ const InstituteDashboard = () => {
     navigate('/signin');
   };
 
-  
   // If no user is set, show a loading screen
   if (!user) {
     return <div>Loading admin dashboard...</div>;
@@ -98,10 +100,12 @@ const InstituteDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-800">
+      {/* Sidebar */}
       <aside className={`bg-gray-800 text-white p-5 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} h-screen`}>
         <div className="flex items-center justify-between mb-8">
-          <button onClick={() => setIsCollapsed(!isCollapsed)} className="collapsible-button">
+          <button onClick={() => setIsCollapsed(!isCollapsed)} className="collapsible-button flex items-center space-x-2">
             <FaBars size={24} />
+            {!isCollapsed && <span className="admin-badge">Admin</span>}
           </button>
         </div>
         <nav className="overflow-y-auto h-full">
@@ -110,9 +114,11 @@ const InstituteDashboard = () => {
               <li key={item.id} className="mb-4">
                 <button
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center w-full p-1 rounded transition-colors ${activeTab === item.id ? 'bg-indigo-800' : 'hover:bg-gray-800'}`}
+                  className={`sidebar-button ${
+                    activeTab === item.id ? 'active' : ''
+                  }`}
                 >
-                  <span className="mr-3 text-2xl">{item.icon}</span>
+                  <span className="icon mr-3 text-2xl">{item.icon}</span>
                   {!isCollapsed && <span>{item.label}</span>}
                 </button>
               </li>
@@ -120,21 +126,39 @@ const InstituteDashboard = () => {
           </ul>
         </nav>
       </aside>
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {renderContent()}
-        </div>
+
+      {/* Main Content */}
+      <main className={`flex-1 overflow-y-auto ${isCollapsed ? 'ml-[80px]' : 'ml-[260px]'}`}>
+        {/* Header */}
+        <header className="header">
+          {/* Search bar */}
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="search-input"
+            />
+            <FiSearch className="search-icon" />
+          </div>
+            {/* Notification and Message Drawers */}
+            <NotificationAndMessageDrawer
+              showNotifications={showNotifications}
+              showMessages={showMessages}
+              onClose={() => {
+                setShowNotifications(false);
+                setShowMessages(false);
+              }}
+            />
+        </header>
+
+        <div className="content">{renderContent()}</div>
       </main>
+
     </div>
   );
 };
 
 export default InstituteDashboard;
-
-
-
-
-
 
 
 

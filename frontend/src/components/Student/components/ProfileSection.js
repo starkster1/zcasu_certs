@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { FiMail, FiUpload } from "react-icons/fi";
 import { IoMdClose } from "react-icons/io";
+import { 
+  FaEthereum, 
+  FaEnvelope, 
+  FaUser, 
+  FaCalendarAlt, 
+  FaGraduationCap, 
+  FaClock, 
+  FaLock, 
+  FaBookReader 
+} from "react-icons/fa";
 import './ProfileSection.css';
 import Loading from '../../../utils/Loading';
 import profImage from '../../../assets/prof.jpg';
@@ -41,6 +51,7 @@ const ProfileSection = () => {
     }
   };
 
+  
   useEffect(() => {
     fetchUserData();
   }, []);
@@ -61,38 +72,48 @@ const ProfileSection = () => {
   return (
     <div className="profile-container">
       {/* Profile Card */}
-      <div className="profile-card">
-        <div className="ribbon"></div> {/* Ribbon */}
-        <img
-          src={profImage}
-          alt="Profile"
-          onError={(e) => {
-            e.target.src =
-              "https://images.unsplash.com/photo-1633332755192-727a05c4013d";
-          }}
-        />
-        <h2 className="profile-name">{`${user?.firstName || ''} ${user?.lastName || ''}`}</h2>
-        <p className="profile-role"><strong>Role:</strong> {user?.role || 'Role not available'}</p>
-        <p className="profile-student-number"><strong>Student Number:</strong> {user?.studentNumber || 'Student Number not available'}</p>
-        <p className="profile-email"><strong>Email:</strong> {user?.email || 'Email not available'}</p>
-        <p className="profile-ethereum-address">{formatEthereumAddress(user?.ethereumAddress)}</p>
-      </div>
+        <div className="profile-card">
+          <div className="ribbon"></div> {/* Ribbon */}
+          <img
+            src={profImage}
+            alt="Profile"
+            onError={(e) => {
+              e.target.src =
+                "https://images.unsplash.com/photo-1633332755192-727a05c4013d";
+            }}
+          />
+          <h2 className="profile-name">
+              {`${user?.firstName || ''} ${user?.lastName || ''}`}
+          </h2>
+          <p className="profile-role">
+            <FaLock className="profile-icon" /> {user?.role || 'Role not available'}
+          </p>
+          <p className="profile-student-number">
+            <FaGraduationCap className="profile-icon" /> {user?.studentNumber || 'Student Number not available'}
+          </p>
+          <p className="profile-email">
+            <FaEnvelope className="profile-icon" /> {user?.email || 'Email not available'}
+          </p>
+          <p className="profile-ethereum-address">
+            <FaEthereum className="profile-icon" /> {formatEthereumAddress(user?.ethereumAddress)}
+          </p>
+        </div>
 
 
       {/* Detail Card */}
       <div className="detail-card">
         <div className="ribbon"></div> {/* Ribbon */}
         <h3>
-          <FiMail /> Basic Information
+           Basic Information
         </h3>
-        <div className="detail-content">
-          <p><strong>Program:</strong> {user?.program || 'N/A'}</p>
-          <p><strong>School Of:</strong> {user?.schoolOf || 'N/A'}</p>
-          <p><strong>Start Date:</strong> {user?.startDate || 'N/A'}</p>
-          <p><strong>End Date:</strong> {user?.endDate || 'N/A'}</p>
-          <p><strong>Duration:</strong> {user?.duration || 'N/A'}</p>
-          <p><strong>Access Level:</strong> {user?.accessLevel || 'N/A'}</p>
-          <p><strong>Study Level:</strong> {user?.studyLevel || 'N/A'}</p>
+         <div className="detail-content">
+          <p><FaBookReader className="icon-gray" /> <strong></strong> {user?.program || 'N/A'}</p>
+          <p><FaBookReader className="icon-gray" /> <strong></strong> {user?.schoolOf || 'N/A'}</p>
+          <p><FaCalendarAlt className="icon-gray" /> <strong>Start Date:</strong> {user?.startDate || 'N/A'}</p>
+          <p><FaCalendarAlt className="icon-gray" /> <strong>End Date:</strong> {user?.endDate || 'N/A'}</p>
+          <p><FaClock className="icon-gray" /> <strong>Duration:</strong> {user?.duration || 'N/A'}</p>
+          <p><FaLock className="icon-gray" /> <strong>Access Level:</strong> {user?.accessLevel || 'N/A'}</p>
+          <p><FaGraduationCap className="icon-gray" /> <strong>Study Level:</strong> {user?.studyLevel || 'N/A'}</p>
         </div>
       </div>
 
