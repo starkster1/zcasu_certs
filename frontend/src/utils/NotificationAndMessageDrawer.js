@@ -19,7 +19,7 @@ const NotificationAndMessageDrawer = () => {
     { id: 3, text: "Your project submission was approved", time: "2 hours ago", read: false },
   ]);
 
-  const [messages, setMessages] = useState([
+  const [messages,] = useState([
     { id: 1, sender: "John Doe", avatar: "images.unsplash.com/photo-1472099645785-5658abf4ff4e", preview: "Hey, can we discuss the new feature?", time: "10:30 AM", unread: true },
     { id: 2, sender: "Jane Smith", avatar: "images.unsplash.com/photo-1494790108377-be9c29b29330", preview: "The design looks great! Just a few tweaks...", time: "Yesterday", unread: true },
     { id: 3, sender: "Mike Johnson", avatar: "images.unsplash.com/photo-1507003211169-0a1dd7228f2d", preview: "Updated the documentation as requested", time: "2 days ago", unread: false },

@@ -187,7 +187,7 @@ const StudentProfileForm = () => {
             {errors.endDate && <p className="text-red-600 text-sm">{errors.endDate}</p>}
           </div>
           <div className={styles.formGroup}>
-            <label>Duration of Study (months) *</label>
+            <label>Duration of Study (Years) *</label>
             <input
               type="number"
               name="duration"

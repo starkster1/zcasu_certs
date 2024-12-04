@@ -1,4 +1,101 @@
-// src/components/AccessRights/AccessRights.js
+import React, { useEffect, useState } from "react";
+import styles from "./AccessRights.module.css";
+
+const AccessRights = () => {
+  const [verifiedRequests, setVerifiedRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVerifiedRequests = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(
+          "http://localhost:5000/api/certificate-requests?status=Verified",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error fetching verified requests:", errorData.message);
+          return;
+        }
+
+        const data = await response.json();
+        setVerifiedRequests(data.requests);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching verified requests:", error);
+      }
+    };
+
+    fetchVerifiedRequests();
+  }, []);
+
+  return (
+    <div className={styles.container}>
+      <h2 className={styles.title}>Access Rights</h2>
+      <div className={styles.card}>
+        {loading ? (
+          <p>Loading verified requests...</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th className={styles.tableHeader}>Student Number</th>
+                <th className={styles.tableHeader}>Document Type</th>
+                <th className={styles.tableHeader}>Access Level</th>
+                <th className={styles.tableHeaderActions}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {verifiedRequests.map((request) => (
+                <tr key={request._id} className={styles.tableRow}>
+                  <td className={styles.tableCell}>{request.studentNumber}</td>
+                  <td className={styles.tableCell}>
+                    {request.metadata.documentType || "N/A"}
+                  </td>
+                  <td className={styles.tableCell}>View Certificates</td>
+                  <td className={styles.tableCellActions}>
+                    <button
+                      className={`${styles.actionButton} ${styles.modifyButton}`}
+                    >
+                      Modify
+                    </button>
+                    <button
+                      className={`${styles.actionButton} ${styles.revokeButton}`}
+                    >
+                      Revoke
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {verifiedRequests.length === 0 && (
+                <tr>
+                  <td colSpan="4" className={styles.noRequests}>
+                    No verified requests available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AccessRights;
+
+
+
+
+
+
+/*// src/components/AccessRights/AccessRights.js
 import React from 'react';
 import styles from './AccessRights.module.css';
 
@@ -28,43 +125,6 @@ const AccessRights = ({ students }) => (
                 <button className={`${styles.actionButton} ${styles.revokeButton}`}>
                   Revoke
                 </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-);
-
-export default AccessRights;
-
-
-
-
-/*// src/components/AccessRights/AccessRights.js
-import React from 'react';
-
-const AccessRights = ({ students }) => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">Access Rights</h2>
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Access Level</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {students.map((student) => (
-            <tr key={student.id}>
-              <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap">View Certificates</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="text-indigo-600 hover:text-indigo-900 mr-2">Modify</button>
-                <button className="text-red-600 hover:text-red-900">Revoke</button>
               </td>
             </tr>
           ))}

@@ -26,6 +26,7 @@
     border-collapse: collapse;
     text-transform: uppercase;
 
+
   }
   
   .tableHeader {
@@ -36,6 +37,9 @@
     font-weight: 600;
     color: white;
     background-color: #4a5568; /* Gray-700 */
+    text-align: center; /* Centers the text horizontally */
+    vertical-align: middle; /* Aligns the text vertically in the middle */
+    padding: 10px; /* Add some padding for spacing */
   }
   
   .tableHeaderActions {
@@ -51,6 +55,8 @@
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
     color: #374151;
+    text-align: center; /* Centers buttons horizontally */
+    vertical-align: middle; /* Aligns buttons vertically in the cell */
   }
   
   .tableCellActions {
@@ -89,3 +95,8 @@
     transform: scale(1.05);
   }
   
+  .noRequests {
+    text-align: center;
+    padding: 20px;
+    color: gray;
+  }

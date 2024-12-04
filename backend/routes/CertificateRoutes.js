@@ -1,183 +1,239 @@
-const express = require('express');
+const express = require("express");
+const multer = require("multer");
+const crypto = require("crypto");
+const FormData = require("form-data");
+const axios = require("axios");
+const CertificateRequest = require("../models/CertificateRequest");
+
 const router = express.Router();
-const CertificateRequest = require('../models/CertificateRequest');
-const jwt = require('jsonwebtoken');  // Don't forget to require jwt if you haven't already!
 
-// Define the authenticateToken function once
-const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) {
-    return res.status(401).json({ message: 'Authorization token is missing.' });
-  }
+// Multer setup for file upload
+const upload = multer({ storage: multer.memoryStorage() });
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('[AUTH] Decoded JWT payload:', decoded);  // Log decoded token
-    req.studentNumber = decoded.studentNumber;  // Set studentNumber from the token
-    req.userRole = decoded.role;  // Set userRole from the token
-    next();  // Proceed to the next middleware
-  } catch (error) {
-    console.error('[AUTH] Token verification failed:', error);
-    return res.status(401).json({ message: 'Invalid or expired token.' });
-  }
+// AES encryption for files
+const encryptFileWithAES = (fileBuffer) => {
+  const symmetricKey = crypto.randomBytes(32); // 256-bit AES key
+  const iv = crypto.randomBytes(16);          // Initialization vector
+  const cipher = crypto.createCipheriv("aes-256-cbc", symmetricKey, iv);
+  const encryptedData = Buffer.concat([cipher.update(fileBuffer), cipher.final()]);
+  return { encryptedData, symmetricKey, iv };
 };
 
-router.post('/certificate-requests', authenticateToken, async (req, res) => {
-  console.log('Request received:', req.body);
-
+router.post("/certificate-requests", upload.single("file"), async (req, res) => {
   try {
-    const { ipfsHash, institute, metadata } = req.body;
-    const studentNumber = parseInt(req.studentNumber, 10);
+    const { studentNumber, institute, metadata } = req.body;
 
-    // Validate `studentNumber`
-    if (!studentNumber || isNaN(studentNumber)) {
-      return res.status(400).json({ message: 'Invalid or missing studentNumber.' });
+    if (!req.file) return res.status(400).json({ message: "File is required." });
+    if (!institute) return res.status(400).json({ message: "Institute address is required." });
+
+    // Enforce PDF file uploads
+    if (req.file.mimetype !== "application/pdf") {
+      return res.status(400).json({ message: "Only PDF files are allowed for certificate uploads." });
     }
 
-    // Validate `ipfsHash`
-    if (!ipfsHash || typeof ipfsHash !== 'string') {
-      return res.status(400).json({ message: 'Invalid IPFS hash.' });
+    let parsedMetadata;
+    try {
+      parsedMetadata = JSON.parse(metadata);
+    } catch {
+      return res.status(400).json({ message: "Invalid metadata format." });
     }
 
-    // Validate `institute`
-    if (!institute || typeof institute !== 'string') {
-      return res.status(400).json({ message: 'Invalid institute address.' });
+     // Add MIME type to metadata
+     parsedMetadata.mimeType = req.file.mimetype;
+
+    // Step 1: Encrypt file
+    const { encryptedData, symmetricKey, iv } = encryptFileWithAES(req.file.buffer);
+
+    // Step 2: Upload encrypted file to IPFS
+    const formData = new FormData();
+    formData.append("file", Buffer.from(encryptedData), {
+      filename: `${req.file.originalname}-encrypted`,
+      contentType: req.file.mimetype,
+    });
+
+    let ipfsHash;
+    try {
+      const ipfsResponse = await axios.post(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+            pinata_api_key: "e4da6b59c2b33a9cb44b",
+            pinata_secret_api_key: "ee4022572d95b88b82c6ca53806118aae97d9b554bb54ee9835fe36fa887316d",
+          },
+        }
+      );
+      ipfsHash = ipfsResponse.data.IpfsHash;
+    } catch (error) {
+      console.error("IPFS upload error:", error.response?.data || error.message);
+      return res.status(500).json({ message: "Failed to upload file to IPFS." });
     }
 
-    // Validate `metadata`
-    if (!metadata || typeof metadata !== 'object') {
-      return res.status(400).json({ message: 'Invalid metadata object.' });
-    }
-
-    // Check for existing certificate request
-    const existingRequest = await CertificateRequest.findOne({ ipfsHash });
-    if (existingRequest) {
-      return res.status(400).json({ message: 'Certificate request already exists.' });
-    }
-
-    // Create and save new certificate request
+    // Step 3: Save to database
     const newRequest = new CertificateRequest({
       studentNumber,
       institute,
       ipfsHash,
-      metadata,
+      encryptedKey: symmetricKey.toString("base64"),
+      iv: iv.toString("base64"),
+      metadata: parsedMetadata,
+      status: "Pending",
     });
 
     await newRequest.save();
-
-    console.log('Certificate request created:', newRequest);
-
-    // Emit notification if Socket.IO is available
-    if (global.io) {
-      global.io.emit('certificate-request-notification', {
-        student: studentNumber,
-        institute,
-        ipfsHash,
-        metadata,
-        timestamp: newRequest.createdAt,
-      });
-    } else {
-      console.warn('Socket.IO instance (global.io) not found. Event not emitted.');
-    }
-
-    // Send success response
     res.status(201).json({
-      message: 'Certificate request submitted successfully.',
-      request: newRequest,
+      message: "Certificate request submitted successfully.",
+      requestId: newRequest._id,
+      ipfsHash,
     });
   } catch (error) {
-    console.error('Error creating certificate request:', error.message);
-    res.status(500).json({ message: 'Internal server error.', error: error.message });
+    console.error("Error in /certificate-requests:", error.message);
+    res.status(500).json({ message: "Failed to process certificate request.", error: error.message });
   }
 });
 
 
-// routes/CertificateRoutes.js
 
-// Get certificate requests by status
-router.get('/certificate-requests', authenticateToken, async (req, res) => {
+/*// Route: Certificate Requests
+router.post("/certificate-requests", upload.single("file"), async (req, res) => {
+  try {
+    const { studentNumber, institute, metadata } = req.body;
+    if (!req.file) return res.status(400).json({ message: "File is required." });
+    if (!institute) return res.status(400).json({ message: "Institute address is required." });
+
+    let parsedMetadata;
+    try {
+      parsedMetadata = JSON.parse(metadata);
+    } catch {
+      return res.status(400).json({ message: "Invalid metadata format." });
+    }
+
+    // Step 1: Encrypt file
+    const { encryptedData, symmetricKey, iv } = encryptFileWithAES(req.file.buffer);
+
+    // Step 2: Upload encrypted file to IPFS
+    const formData = new FormData();
+    formData.append("file", Buffer.from(encryptedData), {
+      filename: `${req.file.originalname}-encrypted`,
+      contentType: req.file.mimetype,
+    });
+
+    let ipfsHash;
+    try {
+      const ipfsResponse = await axios.post(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+            pinata_api_key: "e4da6b59c2b33a9cb44b", 
+            pinata_secret_api_key: "ee4022572d95b88b82c6ca53806118aae97d9b554bb54ee9835fe36fa887316d",
+          },
+        }
+      );
+      ipfsHash = ipfsResponse.data.IpfsHash;
+    } catch (error) {
+      console.error("IPFS upload error:", error.response?.data || error.message);
+      return res.status(500).json({ message: "Failed to upload file to IPFS." });
+    }
+
+    // Step 3: Save to database
+    const newRequest = new CertificateRequest({
+      studentNumber,
+      institute,
+      ipfsHash,
+      encryptedKey: symmetricKey.toString("base64"),
+      iv: iv.toString("base64"),
+      metadata: parsedMetadata,
+      status: "Pending",
+    });
+
+    await newRequest.save();
+    res.status(201).json({
+      message: "Certificate request submitted successfully.",
+      requestId: newRequest._id,
+      ipfsHash,
+    });
+  } catch (error) {
+    console.error("Error in /certificate-requests:", error.message);
+    res.status(500).json({ message: "Failed to process certificate request.", error: error.message });
+  }
+});
+*/
+
+// Route: Get Certificate Requests by Status
+router.get("/certificate-requests", async (req, res) => {
   try {
     const { status } = req.query;
 
     if (!status) {
-      return res.status(400).json({ message: 'Status query parameter is required.' });
+      return res.status(400).json({ message: "Status query parameter is required." });
     }
 
-    // Fetch certificate requests by status
-    const requests = await CertificateRequest.find({ status }).select('studentNumber ipfsHash status institute timestamp metadat');
+    console.log("Fetching certificate requests with status:", status);
+
+    const requests = await CertificateRequest.find({ status }).select(
+      "_id studentNumber ipfsHash status institute timestamp metadata encryptedKey iv"
+    );
 
     if (!requests.length) {
-      return res.status(404).json({ message: 'No certificate requests found for the given status.' });
+      return res.status(404).json({ message: "No certificate requests found for the given status." });
     }
 
     res.status(200).json({ requests });
   } catch (error) {
-    console.error('Error fetching certificate requests:', error.message);
-    res.status(500).json({ message: 'Internal server error.', error: error.message });
+    console.error("Error fetching certificate requests:", error.message);
+    res.status(500).json({ message: "Internal server error.", error: error.message });
   }
 });
 
-/*// Get certificate requests by status
-router.get('/certificate-requests', authenticateToken, async (req, res) => {
-  try {
-    const { status } = req.query;
 
-    if (!status) {
-      return res.status(400).json({ message: 'Status query parameter is required.' });
-    }
-
-    // Filter certificate requests by status
-    const requests = await CertificateRequest.find({ status });
-
-    // Ensure the response includes `studentNumber`
-    const enrichedRequests = requests.map((req) => ({
-      _id: req._id,
-      student: req.student, // Student number
-      institute: req.institute,
-      ipfsHash: req.ipfsHash,
-      status: req.status,
-      createdAt: req.timestamp,
-    }));
-
-    if (!enrichedRequests.length) {
-      return res.status(404).json({ message: 'No certificate requests found for the given status.' });
-    }
-
-    res.status(200).json({ requests: enrichedRequests });
-  } catch (error) {
-    console.error('Error fetching certificate requests:', error.message);
-    res.status(500).json({ message: 'Internal server error.', error: error.message });
-  }
-});*/
-
-// Update request status route
-router.post('/update-request-status', authenticateToken, async (req, res) => {
+// Route: Update Certificate Request Status
+router.post("/update-request-status", async (req, res) => {
   try {
     const { requestId, status } = req.body;
 
-    if (req.userRole !== 'admin') {
-      return res.status(403).json({ message: 'Access denied.' });
+    // Validate input
+    if (!requestId || !status) {
+      return res.status(400).json({ message: "Request ID and status are required." });
     }
 
+    console.log(`Updating status for request ID: ${requestId} to: ${status}`);
+
+    // Find the request by ID
     const request = await CertificateRequest.findById(requestId);
     if (!request) {
-      return res.status(404).json({ message: 'Certificate request not found.' });
+      return res.status(404).json({ message: "Certificate request not found." });
     }
 
+    // Update the status
     request.status = status;
-    if (status === 'Verified') {
-      request.verificationDate = new Date();
+
+    if (status === "Verified") {
+      request.verificationDate = new Date(); // Add verification timestamp
     }
+
     await request.save();
 
-    // Emit notification if Socket.IO is available
-    io.emit('certificate-status-updated', { requestId, status, verificationDate: request.verificationDate });
+    console.log(`Status updated successfully for request ID: ${requestId}`);
 
-    res.status(200).json({ message: 'Request status updated successfully.', request });
+    // Emit an event via Socket.IO if connected
+    if (req.app.get("socketio")) {
+      req.app.get("socketio").emit("certificate-status-updated", {
+        requestId,
+        status,
+        verificationDate: request.verificationDate || null,
+      });
+    }
+
+    // Return a success response
+    res.status(200).json({ message: "Request status updated successfully.", request });
   } catch (error) {
-    console.error('Error updating request status:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+    console.error("Error updating request status:", error.message);
+    res.status(500).json({ message: "Failed to update request status.", error: error.message });
   }
 });
+
 
 module.exports = router;

@@ -55,9 +55,31 @@
 }
 
 .requestItem {
-  padding: 1rem;
-  border-bottom: 1px solid #e5e5e5;
+  position: relative; /* Ensure ribbon is positioned relative to the card */
+  background: #f9f9f9; /* Card background color */
+  padding: 16px; /* Padding inside the card */
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 16px; /* Spacing between cards */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the card */
+  overflow: hidden; /* Ensures ribbon doesn't overflow */
 }
+
+.ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; /* Full width across the top */
+  height: 0.5px;
+  background-color: #007BFF; /* Blue color for ribbon */
+  color: white; /* White text color */
+  text-align: center; /* Center the text */
+  font-size: 14px; /* Adjust font size */
+  font-weight: bold; /* Make text bold */
+  padding: 4px 0; /* Padding for ribbon */
+  border-top-left-radius: 8px; /* Match card corner radius */
+  border-top-right-radius: 8px; /* Match card corner radius */
+}
+
 
 .requestItem:last-child {
   border-bottom: none;

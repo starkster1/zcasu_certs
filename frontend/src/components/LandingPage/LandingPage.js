@@ -117,46 +117,46 @@ const LandingPage = () => {
         </main>
 
         <footer className={styles.footer}>
-      <div className={styles.footerContainer}>
-        <div className={styles.footerGrid}>
-          <div>
-            <h3 className={styles.footerHeading}>Contact Us</h3>
-            <div className={styles.contactInfo}>
-              <p className={styles.contactItem}>
-                <FaPhone className={styles.icon} /> +260 211 232093 / 5
-              </p>
-              <p className={styles.contactItem}>
-                <FaEnvelope className={styles.icon} /> info@zcasu.edu.zm
-              </p>
-              <p className={styles.contactItem}>
-                <FaMapMarkerAlt className={styles.icon} /> Dedan Kimathi Road, Lusaka, Zambia
-              </p>
+          <div className={styles.footerContainer}>
+            <div className={styles.footerGrid}>
+              <div>
+                <h3 className={styles.footerHeading}>Contact Us</h3>
+                <div className={styles.contactInfo}>
+                  <p className={styles.contactItem}>
+                    <FaPhone className={styles.icon} /> +260 211 232093 / 5
+                  </p>
+                  <p className={styles.contactItem}>
+                    <FaEnvelope className={styles.icon} /> info@zcasu.edu.zm
+                  </p>
+                  <p className={styles.contactItem}>
+                    <FaMapMarkerAlt className={styles.icon} /> Dedan Kimathi Road, Lusaka, Zambia
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h3 className={styles.footerHeading}>Quick Links</h3>
+                <ul className={styles.quickLinks}>
+                  <li><Link to="#" className={styles.quickLink}>About Us</Link></li>
+                  <li><Link to="#" className={styles.quickLink}>Programs</Link></li>
+                  <li><Link to="#" className={styles.quickLink}>Student Portal</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className={styles.footerHeading}>Follow Us</h3>
+                <p className={styles.socialText}>Stay connected with us on social media</p>
+                <div className={styles.socialIcons}>
+                  <FaFacebook className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+                  <FaTwitter className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+                  <FaLinkedin className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+                  <FaInstagram className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
+                </div>
+              </div>
+            </div>
+            <div className={styles.footerBottom}>
+              <p>© 2024 ZCAS University. All rights reserved.</p>
             </div>
           </div>
-          <div>
-            <h3 className={styles.footerHeading}>Quick Links</h3>
-            <ul className={styles.quickLinks}>
-              <li><Link to="#" className={styles.quickLink}>About Us</Link></li>
-              <li><Link to="#" className={styles.quickLink}>Programs</Link></li>
-              <li><Link to="#" className={styles.quickLink}>Student Portal</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className={styles.footerHeading}>Follow Us</h3>
-            <p className={styles.socialText}>Stay connected with us on social media</p>
-            <div className={styles.socialIcons}>
-              <FaFacebook className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
-              <FaTwitter className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
-              <FaLinkedin className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
-              <FaInstagram className="text-2xl text-gray-400 hover:text-white cursor-pointer" />
-            </div>
-          </div>
-        </div>
-        <div className={styles.footerBottom}>
-          <p>© 2024 ZCAS University. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
+        </footer>
 
       </div>
     </div>

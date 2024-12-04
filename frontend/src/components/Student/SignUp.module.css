@@ -1,0 +1,169 @@
+.container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  background-color: #f9fbfd;
+  position: relative;
+  overflow: hidden;
+}
+
+.buttonWrapper {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.buttonConnect {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  background-color: #3e2272;
+  transition: background-color 0.3s ease;
+}
+
+.buttonConnect:hover {
+  background-color: rgba(255, 183, 0, 0.9);
+}
+
+.formSection {
+  position: relative;
+  left: 1%; /* Move 20% to the right */
+  max-width: 35rem;
+  padding: 3rem;
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.logoSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fbfd;
+  text-align: center;
+  padding: 2rem;
+}
+
+.headerImage {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.inputField {
+  width: 90%;
+  padding: 13px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.inputFieldError {
+  border-color: #e53e3e;
+}
+
+.errorMessage {
+  color: #e53e3e;
+  font-size: 12px;
+}
+
+.successMessage {
+  color: #38a169;
+  font-size: 14px;
+}
+
+.buttonConnect:hover {
+  background-color: #f7c600; 
+}
+
+.logo {
+  width: 200px; /* Increased logo size */
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+
+.title {
+  font-weight: bold;
+  font-size: 2.25rem; /* Increased font size */
+  margin-top: 1rem;
+}
+
+.subText {
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.header {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .loginButton {
+    font-size: 1rem; /* Adjust font size */
+    color: #6c757d; /* Neutral color for the text */
+    text-align: center;
+    margin-top: 1rem; /* Adds spacing above the text */
+  }
+  
+  .loginButton a {
+    color: #007bff; /* Highlighted color for the link */
+    text-decoration: none; /* Removes the underline from the link */
+    font-weight: bold; /* Makes the link text bold */
+  }
+  
+  .loginButton a:hover {
+    color: #0056b3; /* Darker shade for hover effect */
+    text-decoration: underline; /* Adds underline on hover */
+  }
+  
+  .buttonContainer {
+    display: flex;
+    justify-content: center; /* Center-align the button horizontally */
+    width: 70%; /* Take up full form width */
+    margin-top: 1rem; /* Add spacing above the button */
+  }
+  
+
+  .subButton {
+    width: 100px; /* Fixed width */
+    flex-shrink: 0; /* Prevent shrinking */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Space between icon and text */
+    background-color: #3e2272;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .subButton:hover {
+    background-color: #5b3498;
+    box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .subButton:active {
+    background-color: #2a1745;
+    transform: translateY(1px);
+  }
+  
+  .subButton:disabled {
+    background-color: #d3d3d3;
+    color: #9e9e9e;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  

@@ -1,38 +1,40 @@
-const axios = require('axios');
+const multer = require('multer');
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const FormData = require('form-data');
-const upload = multer();
 
-router.post('/upload', upload.single('file'), async (req, res) => {
-  const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
+// Multer configuration for memory storage and file size limits
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+});
 
-  // Check that the file was received
-  if (!req.file) {
-    console.error("No file uploaded in the request.");
-    return res.status(400).json({ error: "No file uploaded." });
+// Middleware to check authorization header
+const checkAuth = (req, res, next) => {
+  const authToken = req.headers.authorization?.split(' ')[1]; // Supports "Bearer <token>"
+  if (!authToken) {
+    console.error("[Authorization Error] Missing auth token.");
+    return res.status(401).json({ error: "Unauthorized. Missing auth token." });
   }
+  next();
+};
 
-  // Set up form data for Pinata
-  const fileBuffer = req.file.buffer;
-  const data = new FormData();
-  data.append('file', fileBuffer, { filename: 'uploadedDocument' });
-
+router.post('/upload', checkAuth, upload.single('file'), async (req, res) => {
   try {
-    const response = await axios.post(url, data, {
-      maxBodyLength: 'Infinity',
-      headers: {
-        ...data.getHeaders(),
-        'pinata_api_key': process.env.PINATA_API_KEY,
-        'pinata_secret_api_key': process.env.PINATA_SECRET_API_KEY,
-      },
-    });
-    console.log("IPFS upload successful, hash:", response.data.IpfsHash);
-    res.json({ IpfsHash: response.data.IpfsHash });
+    console.log("[Upload Route] Request received");
+    console.log("[Headers]:", req.headers);
+
+    if (!req.file) {
+      console.error("[Error] No file uploaded.");
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+    console.log("[File Details]:", req.file);
+
+    // Simulate success response for debugging
+    res.status(200).json({ message: "File received successfully" });
   } catch (error) {
-    console.error("Error uploading to IPFS:", error.message);
-    res.status(500).json({ error: 'Failed to upload to IPFS' });
+    console.error("[Backend Error]:", error.stack);
+    res.status(500).json({ error: "Internal server error occurred", details: error.message });
   }
 });
 

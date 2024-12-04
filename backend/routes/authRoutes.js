@@ -330,7 +330,7 @@ const contractABI = [
     "type": "function"
   }
 ];
-const contractAddress = '0xA3F0BcFb81653415c266F878d575d461D01a7E7c'; // Replace with your contract address
+const contractAddress = '0xA39e30e17F63F8b6AD4CE2ddcfb76fC36FE2444f'; // Replace with your contract address
 
 // MetaMask verification utility function for admin
 const checkMetaMaskAdmin = async (ethAddress) => {
@@ -551,6 +551,22 @@ router.post('/register', async (req, res) => {
 });
 
 
+router.get('/users', async (req, res) => {
+  try {
+    // Fetch users with only the required fields
+    const users = await User.find({}, 'studentNumber ethereumAddress role');
+
+    if (!users.length) {
+      return res.status(404).json({ message: 'No registered users found.' });
+    }
+
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error('Error fetching users:', error.message);
+    res.status(500).json({ message: 'Failed to fetch users.', error: error.message });
+  }
+});
+
 
 // Route to check if a user is registered by Ethereum address
 router.get('/check-registration', async (req, res) => {
@@ -571,7 +587,6 @@ router.get('/check-registration', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 
 const authenticateToken = (req, res, next) => {
@@ -596,7 +611,8 @@ const authenticateToken = (req, res, next) => {
     // Attach the required fields to the `req` object
     req.userId = decoded.id; // User ID
     req.userRole = decoded.role; // Role (e.g., student or admin)
-
+    req.ethereumAddress = decoded.ethereumAddress; // Ethereum Address
+    
     // Additional checks for student-specific fields
     if (decoded.role === 'student') {
       if (!decoded.studentNumber) {
@@ -609,6 +625,7 @@ const authenticateToken = (req, res, next) => {
       userId: req.userId,
       userRole: req.userRole,
       studentNumber: req.studentNumber || null, // Null for non-students
+      ethereumAddress: req.ethereumAddress || null, // Null if not available
     });
 
     next(); // Move to the next middleware or route handler

@@ -39,17 +39,17 @@ const PasswordStrengthIndicator = ({ score, feedback }) => {
   return (
     <Box sx={{ width: '100%', mt: 1 }}>
       <LinearProgress
-        variant="determinate"
-        value={(score + 1) * 20}
-        color={getColor(score)}
-        sx={{ height: 8, borderRadius: 4 }}
-      />
+          variant="determinate"
+          value={score * 25} // Adjusted scaling
+          color={getColor(score)}
+          sx={{ height: 8, borderRadius: 4 }}
+        />
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
         <Typography variant="caption" color={`${getColor(score)}.main`}>
           {getLabel(score)}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {(score + 1) * 20}%
+          {score * 25}%
         </Typography>
       </Box>
       {feedback.length > 0 && (
@@ -59,6 +59,7 @@ const PasswordStrengthIndicator = ({ score, feedback }) => {
               • {tip}
             </Typography>
           ))}
+          
         </Box>
       )}
     </Box>

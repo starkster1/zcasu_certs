@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { FiMail, FiUpload } from "react-icons/fi";
+import { FiUpload } from "react-icons/fi";
 import { IoMdClose } from "react-icons/io";
 import { 
   FaEthereum, 
-  FaEnvelope, 
-  FaUser, 
+  FaEnvelope,
   FaCalendarAlt, 
   FaGraduationCap, 
   FaClock, 
@@ -109,11 +108,11 @@ const ProfileSection = () => {
          <div className="detail-content">
           <p><FaBookReader className="icon-gray" /> <strong></strong> {user?.program || 'N/A'}</p>
           <p><FaBookReader className="icon-gray" /> <strong></strong> {user?.schoolOf || 'N/A'}</p>
-          <p><FaCalendarAlt className="icon-gray" /> <strong>Start Date:</strong> {user?.startDate || 'N/A'}</p>
-          <p><FaCalendarAlt className="icon-gray" /> <strong>End Date:</strong> {user?.endDate || 'N/A'}</p>
-          <p><FaClock className="icon-gray" /> <strong>Duration:</strong> {user?.duration || 'N/A'}</p>
-          <p><FaLock className="icon-gray" /> <strong>Access Level:</strong> {user?.accessLevel || 'N/A'}</p>
-          <p><FaGraduationCap className="icon-gray" /> <strong>Study Level:</strong> {user?.studyLevel || 'N/A'}</p>
+          <p><FaCalendarAlt className="icon-gray" /> Start: {user?.startDate || 'N/A'}</p>
+          <p><FaCalendarAlt className="icon-gray" /> End:{user?.endDate || 'N/A'}</p>
+          <p><FaClock className="icon-gray" /> {user?.duration || 'N/A'} years</p>
+          <p><FaLock className="icon-gray" /> {user?.accessLevel || 'N/A'}</p>
+          <p><FaGraduationCap className="icon-gray" /> {user?.studyLevel || 'N/A'}</p>
         </div>
       </div>
 

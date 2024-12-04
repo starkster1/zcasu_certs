@@ -1,11 +1,4 @@
 /* Sidebar Styles */
-.sidebar {
-  background-color: #2d2d2d;
-  color: white;
-  width: 260px;
-  transition: width 0.3s;
-}
-
 .sidebar.collapsed {
   width: 80px;
 }
@@ -88,4 +81,52 @@
 .mainContent {
   padding: 20px;
   overflow-y: auto;
+}
+
+/* Wrapper to control overflow */
+.sidebar-wrapper {
+  position: relative; /* Ensures proper alignment */
+  height: 100vh; /* Full viewport height */
+  overflow-y: scroll; /* Enables scrolling */
+  padding-right: 16px; /* Adds space for the scrollbar */
+  box-sizing: content-box; /* Ensures padding doesn’t affect width */
+  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+  scrollbar-width: thin; /* For modern browsers */
+  scrollbar-color: #555 #222; /* Scrollbar styling */
+}
+/* Admin badge styling */
+/* Admin Badge Styling */
+.admin-badge {
+  position: absolute; /* Position in top-right */
+  top: 10px; /* Adjust as needed */
+  right: 10px; /* Adjust as needed */
+  background-color: #2563eb; /* Blue background */
+  color: #fff; /* White text */
+  font-size: 0.875rem; /* Small font size */
+  font-weight: bold; /* Bold text */
+  padding: 4px 8px; /* Padding around text */
+  border-radius: 8px; /* Rounded corners */
+  z-index: 10; /* Ensure it stays on top */
+}
+
+/* Sidebar styling (inside the wrapper) */
+.sidebar-wrapper aside {
+  height: 100%; /* Full height for scrolling */
+  overflow: auto; /* Prevent internal overflow */
+  
+}
+
+/* Remove scrollbars inside the sidebar */
+.sidebar-wrapper::-webkit-scrollbar {
+  width: 10px; /* Customize scrollbar width */
+}
+
+.sidebar-wrapper::-webkit-scrollbar-thumb {
+  background: #555; /* Customize scrollbar color */
+  border-radius: 4px; /* Rounded scrollbar edges */
+}
+
+.sidebar-wrapper::-webkit-scrollbar-track {
+  background: #222; /* Background of the scrollbar track */
 }
