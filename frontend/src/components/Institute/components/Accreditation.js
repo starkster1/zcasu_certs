@@ -101,7 +101,7 @@ const AccreditationSystem = () => {
             alt="University Logo"
             className={styles.logo}
         />
-        <h1 className={styles.title}>Accreditation System</h1>
+        <h1 className={styles.title}>Accreditation</h1>
         <p className={styles.subtitle}>
           Enter student information and upload required documents
         </p>

@@ -6,7 +6,7 @@ import LandingPage from "./components/LandingPage/LandingPage";
 import SignUp from "./components/Student/SignUp";
 import SignIn from "./components/Student/SignIn";
 import Wallet from "./utils/Wallet"; 
-import { connectToMetaMask } from "./utils/metamask"; 
+import { connectToMetaMask } from "./utils/metamask";
 import StudentDashboard from "./components/Student/StudentDashboard"; 
 import InstituteDashboard from "./components/Institute/InstituteDashboard";
 import MyDocuments from "./components/Student/components/MyDocuments";

@@ -6,6 +6,7 @@ const DashboardContent = ({ userName, isWaving }) => (
     <h1 className={styles.dashboardHeading}>
       Welcome back {userName}!{" "}
       <span className={isWaving ? styles.waveHand : ""}>🖐️</span>
+
     </h1>
 
     {/* Blockchain Certificate Verification System Placeholder */}

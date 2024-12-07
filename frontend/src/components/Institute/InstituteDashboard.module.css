@@ -1,6 +1,26 @@
-/* Sidebar Styles */
+.dashboardContainer {
+  display: flex;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: #2c3e50;
+  color: white;
+  transition: width 0.3s ease-in-out;
+}
+
 .sidebar.collapsed {
   width: 80px;
+}
+
+.collapseButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin: 1rem;
 }
 
 .sidebar ul {
@@ -9,124 +29,60 @@
   margin: 0;
 }
 
-.sidebar li {
-  margin-bottom: 20px;
+.sidebar ul li {
+  margin-bottom: 1rem;
 }
 
-.sidebar button {
+.sidebar ul li button {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 10px 15px;
-  border: none;
   background: none;
+  border: none;
   color: white;
-  font-size: 16px;
+  padding: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  text-align: left;
 }
 
-.sidebar button:hover {
-  background-color: #404040;
+.sidebar ul li button:hover,
+.sidebar ul li button.activeTab {
+  background-color: #34495e;
 }
 
-.sidebar button.active {
-  background-color: #4c4c4c;
+.icon {
+  margin-right: 1rem;
+  font-size: 1.5rem;
 }
 
-.sidebar .icon {
-  margin-right: 10px;
-  font-size: 20px;
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Header Styles */
 .header {
+  padding: 1rem;
   background-color: white;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #ddd;
 }
 
 .searchBar {
   display: flex;
   align-items: center;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  padding: 5px 10px;
-  width: 250px;
 }
 
-.searchInput {
-  border: none;
-  outline: none;
-  background: none;
+.searchBar input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.content {
+  padding: 1rem;
+  background-color: white;
   flex: 1;
-}
-
-.headerIcons {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.headerIcon {
-  font-size: 24px;
-  color: #6b7280;
-  cursor: pointer;
-}
-
-/* Main Content */
-.mainContent {
-  padding: 20px;
-  overflow-y: auto;
-}
-
-/* Wrapper to control overflow */
-.sidebar-wrapper {
-  position: relative; /* Ensures proper alignment */
-  height: 100vh; /* Full viewport height */
-  overflow-y: scroll; /* Enables scrolling */
-  padding-right: 16px; /* Adds space for the scrollbar */
-  box-sizing: content-box; /* Ensures padding doesn’t affect width */
-  overflow-y: auto; /* Enables vertical scrolling */
-  overflow-x: hidden; /* Prevents horizontal scrolling */
-  scrollbar-width: thin; /* For modern browsers */
-  scrollbar-color: #555 #222; /* Scrollbar styling */
-}
-/* Admin badge styling */
-/* Admin Badge Styling */
-.admin-badge {
-  position: absolute; /* Position in top-right */
-  top: 10px; /* Adjust as needed */
-  right: 10px; /* Adjust as needed */
-  background-color: #2563eb; /* Blue background */
-  color: #fff; /* White text */
-  font-size: 0.875rem; /* Small font size */
-  font-weight: bold; /* Bold text */
-  padding: 4px 8px; /* Padding around text */
-  border-radius: 8px; /* Rounded corners */
-  z-index: 10; /* Ensure it stays on top */
-}
-
-/* Sidebar styling (inside the wrapper) */
-.sidebar-wrapper aside {
-  height: 100%; /* Full height for scrolling */
-  overflow: auto; /* Prevent internal overflow */
-  
-}
-
-/* Remove scrollbars inside the sidebar */
-.sidebar-wrapper::-webkit-scrollbar {
-  width: 10px; /* Customize scrollbar width */
-}
-
-.sidebar-wrapper::-webkit-scrollbar-thumb {
-  background: #555; /* Customize scrollbar color */
-  border-radius: 4px; /* Rounded scrollbar edges */
-}
-
-.sidebar-wrapper::-webkit-scrollbar-track {
-  background: #222; /* Background of the scrollbar track */
 }

@@ -1,0 +1,47 @@
+// src/data/programs.js
+export const programsBySchool = {
+    business: [
+      "Bachelor of Accounting",
+      "Bachelor of Accounting and Finance",
+      "Bachelor of Accounting with Education",
+      "Bachelor of Arts in Financial Services",
+      "Bachelor of Business Administration",
+      "Bachelor of Business Entrepreneurship",
+      "Bachelor of Management Accounting",
+      "Bachelor of Science Banking and Finance",
+      "Bachelor of Science in Accountancy",
+      "Bachelor of Science in Accounting",
+      "Bachelor of Science in Accounting and Finance",
+      "Bachelor of Science in Finance and Investment Management",
+      "Bachelor of Science in Marketing Management",
+      "Bachelor of Science in Procurement & Supplies",
+      "Bachelor of Arts (Hons) in Business Purchasing and Supply Chain Management – University of Greenwich",
+      "Bachelor of Arts (Hons) in Business Studies – University of Greenwich",
+      "Master of Business Administration (Finance)",
+      "Master of Science in Accounting and Finance",
+    ],
+    social_sciences: [
+      "Bachelor of Arts in Economics",
+      "Bachelor of Arts in Human Resource Management",
+      "Bachelor of Arts in Public Administration & Management",
+      "Bachelor of Economics and Finance",
+      "Bachelor of Laws (LLB Commercial Law)",
+      "Bachelor of Science in Development Finance",
+      "Master of Laws in Corporate and Commercial Laws",
+    ],
+    computing: [
+      "Bachelor of Science in Business Computing",
+      "Bachelor of Science in Computer Science",
+      "Bachelor of Science in Cyber Security",
+      "Bachelor of Science in Information Technology",
+      "Master of Science in Computer Science",
+      "PhD in Computer Science",
+    ],
+    law: [
+      "Bachelor of Laws (LLB Commercial Law)",
+      "Bachelor of Laws (LLB Generic)",
+      "Master of Laws in Corporate and Commercial Laws",
+      "Master of Laws in Taxation and Investment",
+    ],
+  };
+  

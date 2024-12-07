@@ -10,8 +10,8 @@ const studentProfileSchema = new mongoose.Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   duration: { type: Number, required: true },
-  accessLevel: { type: String, enum: ['basic', 'admin'], default: 'basic' },
-  studyLevel: { type: String, enum: ['diploma', 'bachelor', 'master'], required: true },
+  accessLevel: { type: String, enum: ['basic',], default: 'basic' },
+  studyLevel: { type: String, enum: ["Diploma", "Bachelor's Degree" ,"Master's Degree", "PhD", "Doctorate"], required: true },
   program: { type: String, required: true },
   schoolOf: { type: String, required: true },
   profilePicture: { type: String, default: null }, // Placeholder for profile picture URL

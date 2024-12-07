@@ -80,8 +80,7 @@ const InstituteDashboard = () => {
     { id: 'linkedAccounts', icon: <FaUserGraduate />, label: 'Linked Accounts' },
     { id: 'accessRights', icon: <FaUserShield />, label: 'Access Rights' },
     { id: 'pendingApprovals', icon: <FaUserClock />, label: 'Pending Approvals' },
-    { id: 'profile', icon: <FaExchangeAlt />, label: 'Profile' },
-    { id: 'Settings', icon: <FaCogs />, label: 'Settings' },
+    { id: 'profile', icon: <FaExchangeAlt />, label: 'Profile Management' },
     { id: 'Logout', icon: <FiLogOut />, label: 'Logout', action: handleLogout },
   ];
 
@@ -106,30 +105,44 @@ const InstituteDashboard = () => {
     <div className="flex h-screen bg-gray-800">
       {/* Sidebar Wrapper */}
       <div className="sidebar-wrapper">
-        <aside className={`bg-gray-800 text-white p-5 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={() => setIsCollapsed(!isCollapsed)} className="collapsible-button flex items-center space-x-2">
+        <aside
+          className={`bg-gray-800 text-white p-5 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}
+        >
+         <div className="collapsible-container">
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="collapsible-button"
+            >
               <FaBars size={24} />
-              {!isCollapsed && <span className="admin-badge">Admin</span>}
             </button>
+            {!isCollapsed && <span className="admin-badge">Admin</span>}
           </div>
           <nav>
-            <ul>
-              {sidebarItems.map((item) => (
-                <li key={item.id} className="mb-4">
-                  <button
-                    onClick={() => setActiveTab(item.id)}
-                    className={`sidebar-button ${activeTab === item.id ? 'active' : ''}`}
-                  >
-                    <span className="icon mr-3 text-2xl">{item.icon}</span>
-                    {!isCollapsed && <span>{item.label}</span>}
-                  </button>
-                </li>
-              ))}
-            </ul>
+          <ul className="sidebar-items">
+            {sidebarItems.map((item) => (
+              <li key={item.id} className="mb-4">
+                <button
+                  onClick={() => {
+                    if (item.id === 'Logout' && item.action) {
+                      console.log('Logging out...'); // Debug log
+                      item.action(); // Trigger logout
+                    } else {
+                      setActiveTab(item.id); // Switch tab
+                    }
+                  }}
+                  className={`sidebar-button ${activeTab === item.id ? 'active' : ''}`}
+                >
+                  <span className="icon mr-3 text-2xl">{item.icon}</span>
+                  {!isCollapsed && <span>{item.label}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+
           </nav>
         </aside>
       </div>
+
   
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto ${isCollapsed ? 'ml-[80px]' : 'ml-[260px]'}`}>

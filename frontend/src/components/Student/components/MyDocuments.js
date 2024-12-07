@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import {Button,Dialog,DialogTitle,
-  DialogContent, DialogContentText,DialogActions, LinearProgress, Typography, Avatar} from '@mui/material';
+import {
+  Button, Dialog, DialogTitle, DialogContent, DialogContentText,
+  DialogActions, LinearProgress, Typography, Avatar
+} from '@mui/material';
 import crypto from 'crypto-browserify';
 import { Buffer } from 'buffer';
-
 import { toast } from 'react-toastify';
 import { useWallet } from '../../../contexts/WalletContext';
 import { useBlockchain } from '../../../hooks/useBlockchain';
 import profImage from '../../../assets/prof.jpg';
-import styles from './MyDocuments.module.css'; // Import the CSS module
-import {FiAward} from "react-icons/fi";
+import './MyDocuments.css'; // Import the CSS module
+import CertificateCard from './CertificateCard'; // Import the new component
 
 const MyDocuments = ({ instituteAddress }) => {
   const { account, connectWallet } = useWallet();
-  const { registerCertificate, getCertificates } = useBlockchain();
+  const { registerCertificate, getCertificates, getCertificateDetails } = useBlockchain();
   const [open, setOpen] = useState(false);
   const [certificate, setCertificate] = useState("");
   const [documents, setDocuments] = useState([]);
@@ -24,23 +25,14 @@ const MyDocuments = ({ instituteAddress }) => {
   useEffect(() => {
     const init = async () => {
       if (!account) {
-        await connectWallet(); 
-      } 
+        await connectWallet();
+      }
       if (account) {
         loadDocuments();
       }
     };
     init();
   }, [account, connectWallet]);
-
-  /*const encryptFileWithAES = async (file) => {
-    const symmetricKey = crypto.randomBytes(32); // Generate a random 256-bit AES key
-    const iv = crypto.randomBytes(16);           // Initialization vector
-    const fileBuffer = await file.arrayBuffer();
-    const cipher = crypto.createCipheriv('aes-256-cbc', symmetricKey, iv);
-    const encryptedData = Buffer.concat([cipher.update(Buffer.from(fileBuffer)), cipher.final()]);
-    return { encryptedData, symmetricKey, iv };
-  };*/
 
   const decryptFileWithAES = async (encryptedData, symmetricKeyBase64, ivBase64) => {
     const symmetricKey = Buffer.from(symmetricKeyBase64, 'base64');
@@ -50,19 +42,39 @@ const MyDocuments = ({ instituteAddress }) => {
     return decryptedData;
   };
 
-
   const loadDocuments = async () => {
+    if (!account) {
+      toast.error("Please connect your wallet to view documents.");
+      return;
+    }
     try {
       const certificates = await getCertificates(account);
-      const formattedDocs = certificates.map((cert) => ({
-        hash: cert.ipfsHash,
-        status: cert.isValid ? 'Verified' : 'Pending',
-        timestamp: cert.timestamp,
-        symmetricKey: cert.symmetricKey,
-        iv: cert.iv
-      }));
-      setDocuments(formattedDocs);
+      const updatedDocs = await Promise.all(
+        certificates.map(async (cert) => {
+          try {
+            const details = await getCertificateDetails(cert.ipfsHash);
+            return {
+              hash: cert.ipfsHash,
+              status: details.isRevoked
+                ? 'Revoked'
+                : details.isValid
+                  ? 'Verified'
+                  : 'Pending',
+              timestamp: Number(cert.timestamp),
+            };
+          } catch (error) {
+            console.error(`Error fetching details for certificate ${cert.ipfsHash}:`, error);
+            return {
+              hash: cert.ipfsHash,
+              status: 'Unknown',
+              timestamp: Number(cert.timestamp)
+            };
+          }
+        })
+      );
+      setDocuments(updatedDocs);
     } catch (error) {
+      console.error("Error loading documents:", error);
       toast.error("Failed to load documents.");
     }
   };
@@ -71,6 +83,17 @@ const MyDocuments = ({ instituteAddress }) => {
     symmetricKey && iv ? viewDecryptedDoc(hash, symmetricKey, iv) : window.open(`https://gateway.pinata.cloud/ipfs/${hash}`, '_blank');
   };
 
+  const viewDecryptedDoc = async (hash, symmetricKeyBase64, ivBase64) => {
+    try {
+      const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`);
+      const encryptedData = await response.arrayBuffer();
+      const decryptedData = await decryptFileWithAES(encryptedData, symmetricKeyBase64, ivBase64);
+      const blob = new Blob([decryptedData]);
+      window.open(URL.createObjectURL(blob), '_blank');
+    } catch (error) {
+      toast.error("Failed to decrypt or open the document.");
+    }
+  };
 
   const handleClickOpen = () => {
     if (!account) {
@@ -95,35 +118,32 @@ const MyDocuments = ({ instituteAddress }) => {
     }
   };
 
-
   const uploadDocument = async (file) => {
     try {
-      const allowedMimeType = "application/pdf"; // Only allow PDFs
-  
+      const allowedMimeType = "application/pdf";
       if (file.type !== allowedMimeType) {
         throw new Error("Only PDF files are allowed for certificate uploads.");
       }
-  
+
       const studentNumber = localStorage.getItem("studentNumber");
       const token = localStorage.getItem("authToken");
-  
+
       if (!studentNumber) throw new Error("Student number is missing.");
       if (!token) throw new Error("Authentication token is missing.");
-  
+
       const metadata = {
         documentType: "Certificate",
         description: "Certificate approval",
       };
-  
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("studentNumber", studentNumber);
       formData.append("institute", instituteAddress);
       formData.append("metadata", JSON.stringify(metadata));
-  
-      console.log("Submitting FormData to backend...");
+
       setIsUploading(true);
-  
+
       const response = await fetch("http://localhost:5000/api/certificate-requests", {
         method: "POST",
         headers: {
@@ -131,153 +151,87 @@ const MyDocuments = ({ instituteAddress }) => {
         },
         body: formData,
       });
-  
+
       setIsUploading(false);
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to upload document.");
       }
-  
+
       const responseData = await response.json();
-      console.log("Certificate Request Successful:", responseData);
-      toast.success(`Request Submitted! IPFS Hash: ${responseData.ipfsHash}`);
-      loadDocuments(); // Refresh documents list.
-    } catch (error) {
-      setIsUploading(false);
-      console.error("Error during document upload:", error.message);
-      toast.error(`Error: ${error.message}`);
-    }
-  };
-  
-  /*const uploadDocument = async (file) => {
-    try {
-      const studentNumber = localStorage.getItem("studentNumber");
-      const token = localStorage.getItem("authToken");
-  
-      if (!studentNumber) throw new Error("Student number is missing.");
-      if (!token) throw new Error("Authentication token is missing.");
-  
-      const metadata = {
-        documentType: "Certificate",
-        description: "Certificate approval",
-      };
-  
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("studentNumber", studentNumber);
-      formData.append("institute", instituteAddress);
-      formData.append("metadata", JSON.stringify(metadata));
-  
-      console.log("Submitting FormData to backend...");
-      setIsUploading(true);
-  
-      const response = await fetch("http://localhost:5000/api/certificate-requests", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-  
-      setIsUploading(false);
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to upload document.");
+      const { ipfsHash } = responseData;
+
+      const success = await registerCertificate(ipfsHash, instituteAddress);
+      if (success) {
+        toast.success("Certificate successfully registered on the blockchain!");
+        handleClose();
+      } else {
+        throw new Error("Blockchain registration failed.");
       }
-  
-      const responseData = await response.json();
-      console.log("Certificate Request Successful:", responseData);
-      toast.success(`Request Submitted! IPFS Hash: ${responseData.ipfsHash}`);
-      loadDocuments(); // Refresh documents list.
+
+      toast.success(`Request Submitted! IPFS Hash: ${ipfsHash}`);
+      loadDocuments();
     } catch (error) {
       setIsUploading(false);
       console.error("Error during document upload:", error.message);
       toast.error(`Error: ${error.message}`);
-    }
-  };
-  */
-  
-  const viewDecryptedDoc = async (hash, symmetricKeyBase64, ivBase64) => {
-    try {
-      const response = await fetch(`https://gateway.pinata.cloud/ipfs/${hash}`);
-      const encryptedData = await response.arrayBuffer();
-      const decryptedData = await decryptFileWithAES(encryptedData, symmetricKeyBase64, ivBase64);
-      const blob = new Blob([decryptedData]);
-      window.open(URL.createObjectURL(blob), '_blank');
-    } catch (error) {
-      toast.error("Failed to decrypt or open the document.");
     }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-3xl font-bold text-gray-800 mb-1">My Documents</h2>
           <p className="text-gray-500 mt-0">(Click on the Document name to view)</p>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 115,          // Adjust the outer container size as needed
-            height: 115,
-            borderRadius: '50%', // Keeps it circular
-            backgroundColor: '#CFD8DC', // Light gray color for the border
-            padding: 5,          // Controls the inner gap between the border and image
-          }}
-        >
-          <img
-            src={profImage} // Replace with your image source
-            alt="User Profile"
-            style={{
-              width: '100%',        // Image should fill the container
-              height: '100%',
-              borderRadius: '50%',  // Keeps the image circular
-              objectFit: 'cover',   // Ensures image covers the area without distortion
-              padding: 5,           // Inner padding within the image to maintain gap from border
-              backgroundColor: '#fff', // White background around the image
-            }}
-          />
-        </div>
+        <div className="image-container">
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 115,
+      height: 115,
+      borderRadius: '50%',
+      backgroundColor: '#CFD8DC',
+      padding: 5,
+    }}
+  >
+    <img
+      src={profImage}
+      alt="User Profile"
+      style={{
+        width: '100%',
+        height: '100%',
+        borderRadius: '50%',
+        objectFit: 'cover',
+        backgroundColor: '#fff',
+      }}
+    />
+  </div>
+</div>
+
+
       </div>
       <div className="grid gap-4">
-      {documents.length > 0 ? (
-        documents.map((doc, index) => (
-          <div key={index} className={styles.certificateCard}>
-            <div className={styles.ribbon}></div> 
-            <div className={styles.certificateContent}>
-              <Avatar className={`${doc.status === 'Pending' ? 'bg-yellow-500' : 'bg-green-500'}`}>
-                <FiAward className="h-5 w-5" />
-              </Avatar>
-              <div>
-                <h3 className="font-semibold">Certificate #{index + 1}</h3>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-600">Status: {doc.status}</p>
-                  <p className="text-sm text-gray-600 text-right">
-                    Uploader: {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'N/A'}
-                  </p>
-                </div>
-                <p className="text-xs text-gray-600">
-                  Upload Date: {new Date(Number(doc.timestamp) * 1000).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-            <Button onClick={() => getDoc(doc.hash, doc.symmetricKey, doc.iv)}>VIEW</Button>
-          </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-600 py-8">
-          {account ? "No documents uploaded yet." : "Please connect your wallet to view documents."}
-        </p>
-      )}
-
+        {documents.length > 0 ? (
+          documents.map((doc, index) => (
+            <CertificateCard
+              key={index}
+              index={index}
+              doc={doc}
+              account={account}
+              onView={() => getDoc(doc.hash, doc.symmetricKey, doc.iv)}
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-600 py-8">
+            {account ? "No documents uploaded yet." : "Please connect your wallet to view documents."}
+          </p>
+        )}
       </div>
-
-
       <Button
         variant="contained"
         color="primary"
@@ -327,4 +281,5 @@ const MyDocuments = ({ instituteAddress }) => {
     </div>
   );
 };
+
 export default MyDocuments;

@@ -1,0 +1,119 @@
+.card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  margin-top: 35px;
+}
+
+.ribbon {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  background-color: #007bff;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Adjust spacing between rows */
+  margin-bottom: 16px;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Adjust spacing between info rows */
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between; /* Align label and value on opposite sides */
+  align-items: center;
+  width: 100%;
+}
+
+.infoLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  text-align: left; /* Ensure labels are aligned left */
+  flex: 1; /* Push the value to the right */
+}
+
+.infoValue {
+  font-size: 14px;
+  color: #333;
+  text-align: right; /* Ensure values are aligned right */
+  flex: 1; /* Allow it to occupy remaining space */
+}
+
+.pendingText {
+  color: #f1c40f;
+  font-weight: bold;
+}
+
+.verifiedText {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.iconContainer {
+  margin-left: auto; /* Push the icon to the far right */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pendingIcon {
+  font-size: 24px;
+  color: #f1c40f;
+}
+
+.verifiedIcon {
+  font-size: 24px;
+  color: #27ae60;
+}
+
+.viewButton {
+  background-color: #007bff;
+  color: white;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  width: 80%;
+  padding: 8px;
+  align-self: center;
+}

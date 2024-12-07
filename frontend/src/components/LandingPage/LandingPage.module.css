@@ -1,30 +1,52 @@
-.minHScreen {
+/* Full-page layout */
+.pageContainer {
   display: flex;
   flex-direction: column;
   height: 100vh; /* Full viewport height */
-  background-color: #f8fafc;
-  width:100%;
+  overflow: hidden; /* Prevent body-level scrolling */
+  width:100vw;
 }
 
+/* Fixed header */
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  width: 100%;
   z-index: 50;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* Restrict main section to scroll independently */
-.mainContent {
-  flex: 1;
-  overflow-y: auto;
-  width:vw;
+/* Scrollable content (main + footer) */
+.scrollableContent {
+  flex: 1; /* Fill remaining space below the header */
+  margin-top: 120px; /* Offset for the fixed header */
+  overflow-y: auto; /* Enable vertical scrolling */
+  display: flex;
+  flex-direction: column;
 }
+
+/* Main content */
+.mainContent {
+  padding: 0px;
+  flex: 1; /* Allow the main content to grow */
+}
+
+/* Footer is part of the scrollable content */
+.footer {
+  background-color: #f8f9fa; /* Light footer background */
+  padding: 1rem 2rem;
+  margin-top: auto; /* Push footer to the bottom of the content */
+}
+
+
 
 .navContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
 }
 
 .navContent {
@@ -38,105 +60,220 @@
   align-items: center;
 }
 
+.navLink:hover {
+  color: #1e3a8a;
+}
+.navContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+}
+
 .logo {
-  height: 48px;
-  margin-right: 1rem;
+  height: 50px;
 }
 
 .logoText {
-  font-size: 1.5rem;
+  margin-left: 10px;
+  font-size: 18px;
   font-weight: bold;
-  color: #1e3a8a;
 }
 
 .navigationLinks {
   display: flex;
-  align-items: center;
   gap: 1rem;
+  margin-left: auto;
 }
 
 .navLink {
-  color: #4b5563;
-  transition: color 0.3s;
+  text-decoration: none; /* Remove underline */
+  color: #333;           /* Keep text color */
+  font-size: 16px;
+  border: none;          /* Remove border */
+  outline: none;         /* Remove focus outline */
+  background: none;      /* Ensure no background is applied */
+  padding: 0;            /* Remove padding (if applicable) */
 }
 
-.navLink:hover {
-  color: #1e3a8a;
-}
 
 .loginButton {
-  background-color: #1e3a8a;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 9999px;
-  transition: background-color 0.3s;
+  padding: 0.5rem 1rem;
+  background: #4F46E5;
+  color: #fff;
+  border-radius: 4px;
   text-decoration: none;
 }
 
-.signUpButton {
-  background-color: #16a34a;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 9999px;
-  transition: background-color 0.3s;
-  text-decoration: none;
-}
-
-.heroSection {
-  background: linear-gradient(to right, #1e3a8a, #2563eb);
-  padding: 5rem 0;
-  margin-top:-25px;
-}
-
-.heroContent {
+.textCenter {
   text-align: center;
-  color: white;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
-.heroTitle {
-  font-size: 2.5rem;
-  font-weight: bold;
-}
-
-.heroSubtitle {
-  font-size: 1.25rem;
-}
-
-.formContainer {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: 2rem auto 0;
-}
-
-.formRow {
+.logoWrapper {
   display: flex;
-  gap: 0.5rem;
+  justify-content: center;
+}
+
+.mainLogo {
+  height: 150px;
+}
+
+.mainHeading {
+  font-size: 3.5rem; /* Increase font size for a bigger look */
+  font-weight: 900; /* Use a heavier font weight for extra thickness */
+  margin: 0 auto; /* Center-align the heading block */
+  text-align: center; /* Ensure text is properly centered */
+  line-height: 1.0; /* Adjust line height for better spacing */
+  letter-spacing: -4.0px; /* Reduce letter spacing */
+  padding: 6px;
+}
+
+.highlight {
+  font-size: 3.0rem; /* Larger font size for emphasis */
+  font-weight: 900; /* Bold and thick */
+  color: #5851cf; /* Highlight color */
+  margin-top: -10px; /* Spacing between lines */
+  display: block; /* Ensure proper stacking in the flow */
+  letter-spacing: -2.9px; /* Reduce letter spacing */
+}
+
+.description {
+  margin-top: 1rem;
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.125rem;
+  color: #6b7280; /* Equivalent to text-gray-500 */
+}
+
+.verificationSection {
+  margin-top: 2rem;
+ 
+}
+
+.inputGroup {
+  display: flex; /* Flexbox for layout */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  gap: 0; /* Remove gap to connect the input and button */
+  margin: 0 auto; /* Center horizontally within its parent */
+  width: fit-content; /* Adjust width to fit content */
 }
 
 .inputField {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
+  width: 300px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #4a4a4a;
+  outline: none;
+  transition: all 0.3s ease;
+  border-top-right-radius: 0; /* Remove border-radius on the right */
+  border-bottom-right-radius: 0; /* Remove border-radius on the right */
+  border-right: none; /* Remove the right border */
+  height: 20px; /* Match the button height */
+}
+
+.inputField:focus {
+  border-color: #5a5bf1;
+  box-shadow: 0 0 5px rgba(90, 91, 241, 0.2);
 }
 
 .verifyButton {
   display: flex;
   align-items: center;
-  background-color: #1e3a8a;
-  color: white;
+  justify-content: center;
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  background-color: #5a5bf1;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  top: -10px; /* Move the button up */
+  width:5px;
+  border-top-left-radius: 0; /* Remove border-radius on the left */
+  border-bottom-left-radius: 0; /* Remove border-radius on the left */
+  margin: 0; /* Ensure no margin between input and button */
+  height: 40px; /* Match the input field height */
+  
+  
 }
 
-.searchIcon {
-  margin-right: 0.5rem;
+
+.verifyButton:hover {
+  background-color: #4b4bd9;
+  box-shadow: 0 5px 15px rgba(90, 91, 241, 0.3);
 }
+
+.verifyButton .icon {
+  margin-right: 0.5rem; /* Space between icon and text */
+  font-size: 1.2rem;
+}
+.resultContainer {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.resultTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.resultDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.detailLabel {
+  font-weight: bold;
+  color: #555;
+}
+
+.detailValue {
+  color: #333;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.primaryButton, .secondaryButton {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: #4F46E5;
+  color: #fff;
+}
+
+.secondaryButton {
+  background: #ddd;
+  color: #333;
+}
+
 
 .howItWorksSection {
   padding: 4rem 0;
@@ -150,11 +287,11 @@
 }
 
 .sectionTitle {
-  font-size: 2rem;
   text-align: center;
-  font-weight: bold;
-  color: #1e3a8a;
   margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111827; /* Equivalent to text-gray-900 */
 }
 
 .stepsGrid {
@@ -181,85 +318,3 @@
   color: #6b7280;
 }
 
-.footer {
-  background-color: #1f2937;
-  color: white;
-  padding: 2rem 0;
-}
-
-.footerContainer {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-.footerGrid {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  color: white;
-}
-
-.footerHeading {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-.contactInfo {
-  margin-top: 1rem;
-}
-
-.contactItem {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.icon {
-  font-size: 1.25rem;
-}
-
-.quickLinks {
-  list-style: none;
-  padding: 1rem;
-  gap: 1rem; 
-  display: flex; 
-  flex-direction: column; 
-  justify-content: flex-start;
-}
-
-.quickLink {
-  text-decoration: none;
-  color: #dce0e4;
-  padding: 1rem;
-}
-
-.quickLink:hover {
-  color: white; /* Hover effect to white */
-}
-
-.footerBottom {
-  border-top: 1px solid white; /* Subtle top border */
-  color: #cbd5e1;
-  padding-top: 1rem;
-  font-size: 0.875rem;
-  text-align: center;
-}
-
-/* Social Icons */
-.socialIcons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.socialIcons svg {
-  font-size: 1.5rem;
-  color: #cbd5e1;
-  transition: color 0.3s;
-  cursor: pointer;
-}
-
-.socialIcons svg:hover {
-  color: #ffffff; /* Hover effect to white */
-}

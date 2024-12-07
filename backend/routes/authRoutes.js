@@ -675,10 +675,6 @@ router.get('/user-profile', authenticateToken, async (req, res) => {
 });
 
 
-module.exports = router;
-
-
-
 router.get('/ethereum-address', authenticateToken, async (req, res) => {
   try {
     if (!req.ethereumAddress) {
@@ -692,3 +688,27 @@ router.get('/ethereum-address', authenticateToken, async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+const handleLogout = async () => {
+  const token = localStorage.getItem('authToken');
+  
+  try {
+    await fetch('http://localhost:5000/api/logout', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (error) {
+    console.error('Error logging out:', error);
+  }
+
+  // Remove token from localStorage and redirect
+  localStorage.removeItem('authToken');
+  navigate('/signin');
+};
+
+
+
+module.exports = router;
+
+

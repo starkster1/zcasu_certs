@@ -59,15 +59,20 @@
   }
   
  /* Add Button Styling */
-.addButton {
-  background-color: #3c1498; /* Purple-600 */
-  color: white;
-  padding: 12px 24px; /* Increased size */
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem; /* Slightly larger font */
-  transition: background-color 0.3s ease, transform 0.3s ease;
+ .addButton {
+  display: flex;
+  align-items: center; /* Align icon and text vertically */
+  gap: 0.5rem; /* Space between icon and text */
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff; /* White text */
+  background-color: #5851cf; /* Purple background */
   border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top:20px;
 }
   .add-Button:hover {
     background-color: #d4af37; /* Gold color */
@@ -102,7 +107,7 @@
   }
   
   .actionButton.edit:hover {
-    background-color: #38a169; /* Green-500 */
+    background-color: #27e34f; /* Green-500 */
     transform: scale(1.05); /* Slight scaling effect */
   }
   
@@ -113,6 +118,6 @@
   }
   
   .actionButton.delete:hover {
-    background-color: #c53030; /* Red-600 */
+    background-color: #cb1818; /* Red-600 */
     transform: scale(1.05); /* Slight scaling effect */
   }

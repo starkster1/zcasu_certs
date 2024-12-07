@@ -136,6 +136,47 @@ router.get('/fetchAllProfiles', async (req, res) => {
   }
 });
 
+// Endpoint to delete a student profile by studentNumber or _id
+router.delete('/deleteProfile', async (req, res) => {
+  const { studentNumber, id } = req.query;
+
+  if (!studentNumber && !id) {
+    return res.status(400).json({ error: 'Either studentNumber or id is required to delete a profile.' });
+  }
+
+  try {
+    const query = studentNumber ? { studentNumber } : { _id: id };
+    const deletedStudent = await StudentProfile.findOneAndDelete(query);
+
+    if (!deletedStudent) {
+      return res.status(404).json({ message: 'Student profile not found.' });
+    }
+
+    res.status(200).json({ message: 'Student profile deleted successfully!' });
+  } catch (error) {
+    console.error('Error deleting student profile:', error);
+    res.status(500).json({ error: 'Failed to delete student profile.' });
+  }
+});
+
+// Update student profile by ID
+router.put('/updateProfile/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const updatedProfile = await StudentProfile.findByIdAndUpdate(id, updates, { new: true });
+    if (!updatedProfile) {
+      return res.status(404).json({ error: 'Student profile not found.' });
+    }
+
+    res.status(200).json(updatedProfile);
+  } catch (error) {
+    console.error('Error updating student profile:', error);
+    res.status(500).json({ error: 'Failed to update student profile.' });
+  }
+});
+
 
 module.exports = router;
 

@@ -1,0 +1,86 @@
+.featuresSection {
+    padding: 6rem 0;
+    background-color: #ffffff;
+  }
+  
+  .container {
+    max-width: 80rem; /* Equivalent to max-w-7xl */
+    margin: 0 auto;
+    padding: 0 1rem; /* Equivalent to px-4 */
+    margin-top:-70px;
+  }
+  
+  .textCenter {
+    text-align: center;
+    margin-bottom: 3rem; /* Add spacing below the heading */
+  }
+  
+  .heading {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827; /* Equivalent to text-gray-900 */
+  }
+  
+  .subheading {
+    margin-top: 1rem;
+    max-width: 40rem;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.125rem;
+    color: #6b7280; /* Equivalent to text-gray-500 */
+  }
+  
+  .featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 3rem;
+    margin-top: 5rem;
+  }
+  
+  @media screen and (min-width: 640px) {
+    .featuresGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media screen and (min-width: 1024px) {
+    .featuresGrid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .featureItem {
+    position: relative;
+  }
+  
+  .iconWrapper {
+    position: absolute;
+    height: 3rem; /* Equivalent to h-12 */
+    width: 3rem; /* Equivalent to w-12 */
+    background-color: #eef2ff; /* Equivalent to bg-indigo-100 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem; /* Equivalent to rounded-xl */
+  }
+  
+  .icon {
+    height: 1.5rem; /* Equivalent to h-6 */
+    width: 1.5rem; /* Equivalent to w-6 */
+    color: #4f46e5; /* Equivalent to text-indigo-600 */
+  }
+  
+  .featureName {
+    margin-left: 4rem; /* Space to accommodate icon */
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827; /* Equivalent to text-gray-900 */
+  }
+  
+  .featureDescription {
+    margin-left: 4rem;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #6b7280; /* Equivalent to text-gray-500 */
+  }
+  

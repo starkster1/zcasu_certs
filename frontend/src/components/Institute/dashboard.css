@@ -30,39 +30,63 @@ body, html {
   padding: 2rem;
 }
 
-/* Sidebar */
+.admin-badge {
+  display: inline-block;
+  padding: 0.1rem 0.3rem; /* Adjust padding for oval shape */
+  font-size: 0.875rem; /* Slightly smaller font size */
+  font-weight: 600;
+  color: white; /* Green text */
+  background-color: #28a745; /* White background for contrast */
+  border: 1px solid #28a745; /* Green border */
+  border-radius: 999px; /* Fully rounded (oval shape) */
+  text-align: center;
+  white-space: nowrap; /* Prevents text wrapping */
+  margin-left: 0.5rem; /* Add spacing between the button and the badge */
+  margin-top: -70px; /* Adjust this value to move it upwards */
+}
+.collapsible-container .admin-badge {
+  opacity: 1; /* Fully visible */
+}
+
+.collapsible-container.collapsed .admin-badge {
+  opacity: 0; /* Hidden when collapsed */
+  pointer-events: none; /* Prevent interaction when hidden */
+}
+.collapsible-container {
+  display: flex;
+  align-items: center; /* Vertically center the items */
+  justify-content: space-between; /* Place the badge to the right */
+  width: 100%; /* Ensure the container spans the sidebar's width */
+}
+
 aside {
   background-color: #333333;
   color: white;
-  overflow-y: hide; /* Allow scrolling */
-  transition: width 1.5s ease-in-out; /* Smooth transition when collapsing */
-  height: 100%; /* Ensure sidebar fills vertical space */
-  display: flex;
-  flex-direction: column;
-  padding: 1rem; /* Add padding inside the sidebar */
-  box-sizing: border-box; /* Ensure padding doesn't overflow */
-  overflow-y: auto; /* Allow scrolling */
-  -ms-overflow-style: none; /* Hide scrollbar on Internet Explorer/Edge */
-  scrollbar-width: none; /* Hide scrollbar on Firefox */
+  height: 100vh; /* Ensure the sidebar fills the full vertical height */
+  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  padding: 1rem; /* Padding inside the sidebar */
+  box-sizing: border-box; /* Include padding in width/height calculation */
+  transition: width 0.3s ease-in-out; /* Smooth transition for collapsible state */
 }
 
+/* Hide Scrollbar (Optional) */
 aside::-webkit-scrollbar {
-  display: none; /* Hide scrollbar on Chrome/Safari */
+  width: 0; /* Removes scrollbar in Webkit-based browsers */
 }
-aside h1 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
+aside {
+  scrollbar-width: none; /* Removes scrollbar in Firefox */
 }
 
-aside ul {
-  list-style: none;
+/* Sidebar Items */
+.sidebar-items {
+  margin: 0;
   padding: 0;
-  margin: 0; /* Remove default margins to prevent horizontal overflow */
+  list-style: none;
 }
 
-aside li {
-  margin-bottom: 1rem;
+.sidebar-items li {
+  margin-bottom: 1rem; /* Add space between items */
 }
 
 /* Sidebar Button */
@@ -84,23 +108,13 @@ aside button {
   box-sizing: border-box; /* Ensure padding fits within container */
 }
 
-.admin-badge {
-  display: inline-block;
-  padding: 0.2rem 0.6rem; /* Adjust padding for oval shape */
-  font-size: 0.875rem; /* Slightly smaller font size */
-  font-weight: 600;
-  color: white; /* Green text */
-  background-color: #28a745; /* White background for contrast */
-  border: 1px solid #28a745; /* Green border */
-  border-radius: 999px; /* Fully rounded (oval shape) */
-  text-align: center;
-  white-space: nowrap; /* Prevents text wrapping */
-}
 
 
 aside button:hover {
   background-color: #555555; /* Darker hover */
 }
+
+
 
 .sidebar-button span.icon {
   margin-right: 1rem; /* Add spacing between icon and text */

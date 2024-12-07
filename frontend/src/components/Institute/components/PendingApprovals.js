@@ -58,6 +58,16 @@ const PendingApprovals = () => {
     setSelectedRequest(null); // Clear the selected request
   };
 
+  // Callback to handle updates to a certificate request
+  const handleActionComplete = async (updatedRequest) => {
+    setRequests((prevRequests) =>
+      prevRequests.map((req) =>
+        req._id === updatedRequest._id ? updatedRequest : req
+      )
+    );
+    handleCloseModal(); // Close the modal after the action
+  };
+
   return (
     <div className={styles.container}>
       <h2 className={styles.heading}>Pending Approvals</h2>
@@ -103,15 +113,15 @@ const PendingApprovals = () => {
               </tr>
             )}
           </tbody>
-
         </table>
       </div>
 
       {/* Modal to view certificate */}
-      {showModal && (
+      {showModal && selectedRequest && (
         <CertificateViewModal
           request={selectedRequest}
           onClose={handleCloseModal}
+          onActionComplete={handleActionComplete} // Pass the handler
         />
       )}
     </div>
