@@ -1,4 +1,5 @@
 .modalBackdrop {
+
     position: fixed;
     top: 0;
     left: 0;
@@ -8,14 +9,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    
   }
   
   .modalContent {
-    background: white;
+    position: relative; /* Position relative to the parent */
+    max-width: 90%; /* Allow some space around the modal */
+    max-height: 90%; /* Prevent the modal from exceeding the viewport */
+    overflow-y: auto; /* Enable scrolling if content is too long */
+    background: #fff; /* White background for the modal */
     padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
   .certificateViewer {

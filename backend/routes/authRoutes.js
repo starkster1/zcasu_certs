@@ -358,38 +358,38 @@ router.post('/login', async (req, res) => {
   try {
     console.log('Login request received:', { studentNumber, ethAddress });
 
-    // Find the user by `studentNumber`
+    // Check if the user exists (Student login)
     let user = await User.findOne({ studentNumber });
     if (user) {
       console.log('Student found:', {
         id: user._id,
         role: user.role,
-        studentNumber: user.studentNumber, // Debug this value
+        studentNumber: user.studentNumber,
         ethereumAddress: user.ethereumAddress,
       });
 
-      // Compare password
+      // Check password match
       const isPasswordMatch = await bcrypt.compare(password, user.password);
       if (!isPasswordMatch) {
-        console.log('Password mismatch for user:', user.studentNumber);
+        console.log('Password mismatch for student:', user.studentNumber);
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      // Check Ethereum address for student
+      // Check Ethereum address match for students
       if (user.ethereumAddress !== ethAddress) {
         console.log('Ethereum address mismatch:', { userAddress: user.ethereumAddress, ethAddress });
         return res.status(401).json({ message: 'Ethereum address mismatch. Please use the registered MetaMask account.' });
       }
 
-      // Generate JWT token for student, including `studentNumber`
+      // Generate JWT token for the student
       const jwtSecret = process.env.JWT_SECRET || 'default_secret';
       const token = jwt.sign(
         {
-          id: user._id, 
+          id: user._id,
           role: user.role,
           studentNumber: user.studentNumber,
           ethereumAddress: user.ethereumAddress
-         },
+        },
         jwtSecret,
         { expiresIn: '1h' }
       );
@@ -404,28 +404,32 @@ router.post('/login', async (req, res) => {
       return res.status(200).json({ token, user });
     }
 
-    // Handle admin login
+    // Check if the admin exists (Admin login)
     let admin = await Admin.findOne({ email: studentNumber }); // Admin login uses email
     if (admin) {
       console.log('Admin found:', admin);
 
-      // Compare password for admin
+      // Check password match
       const isPasswordMatch = await bcrypt.compare(password, admin.password);
       if (!isPasswordMatch) {
         console.log('Password mismatch for admin:', admin.email);
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      // Check Ethereum address for admin
+      // Check Ethereum address match for admins
       if (admin.ethereumAddress !== ethAddress) {
         console.log('Ethereum address mismatch for admin:', { adminAddress: admin.ethereumAddress, ethAddress });
         return res.status(401).json({ message: 'Ethereum address mismatch. Please use the registered MetaMask account.' });
       }
 
-      // Generate JWT token for admin
+      // Generate JWT token for the admin
       const jwtSecret = process.env.JWT_SECRET || 'default_secret';
       const token = jwt.sign(
-        { id: admin._id, role: admin.role, ethereumAddress: admin.ethereumAddress },
+        {
+          id: admin._id,
+          role: admin.role,
+          ethereumAddress: admin.ethereumAddress
+        },
         jwtSecret,
         { expiresIn: '1h' }
       );
@@ -438,20 +442,56 @@ router.post('/login', async (req, res) => {
       return res.status(200).json({ token, user: admin });
     }
 
-    // Check if MetaMask address is an admin
+    // Check if the MetaMask address belongs to an admin
     const isMetaMaskAdmin = await checkMetaMaskAdmin(ethAddress);
     if (isMetaMaskAdmin) {
       console.log('MetaMask address is an admin:', ethAddress);
 
-      // Register new admin in MongoDB
+      // Check if admin with the same address already exists
+      admin = await Admin.findOne({ ethereumAddress: ethAddress });
+      if (admin) {
+        console.log('Existing admin found, logging in:', admin);
+
+        // Check password match for existing admin
+        const isPasswordMatch = await bcrypt.compare(password, admin.password);
+        if (!isPasswordMatch) {
+          console.log('Password mismatch for existing admin:', admin.email);
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate JWT token for the existing admin
+        const jwtSecret = process.env.JWT_SECRET || 'default_secret';
+        const token = jwt.sign(
+          {
+            id: admin._id,
+            role: admin.role,
+            ethereumAddress: admin.ethereumAddress
+          },
+          jwtSecret,
+          { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({ token, user: admin });
+      }
+
+      // Register new admin if not found
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newAdmin = new Admin({ email: studentNumber, password: hashedPassword, ethereumAddress: ethAddress, role: 'admin' });
+      const newAdmin = new Admin({
+        email: studentNumber,
+        password: hashedPassword,
+        ethereumAddress: ethAddress,
+        role: 'admin'
+      });
       await newAdmin.save();
 
-      // Generate JWT token for new admin
+      // Generate JWT token for the new admin
       const jwtSecret = process.env.JWT_SECRET || 'default_secret';
       const token = jwt.sign(
-        { id: newAdmin._id, role: 'admin', ethereumAddress: newAdmin.ethereumAddress },
+        {
+          id: newAdmin._id,
+          role: 'admin',
+          ethereumAddress: newAdmin.ethereumAddress
+        },
         jwtSecret,
         { expiresIn: '1h' }
       );
@@ -635,13 +675,11 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-
 router.get('/user-profile', authenticateToken, async (req, res) => {
   try {
     let userProfile;
 
     if (req.userRole === 'student') {
-      // Fetch from StudentProfile based on studentNumber
       console.log('Fetching profile for studentNumber:', req.studentNumber);
       userProfile = await StudentProfile.findOne({ studentNumber: req.studentNumber }).select(
         'firstName lastName email studentNumber program schoolOf startDate endDate duration accessLevel studyLevel profilePicture'
@@ -650,8 +688,9 @@ router.get('/user-profile', authenticateToken, async (req, res) => {
         console.error(`Student profile not found for studentNumber: ${req.studentNumber}`);
         return res.status(404).json({ message: 'Student profile not found' });
       }
+      // Add ethereumAddress from req
+      userProfile = { ...userProfile.toObject(), ethereumAddress: req.ethereumAddress };
     } else if (req.userRole === 'admin') {
-      // Fetch from Admin collection
       userProfile = await Admin.findById(req.userId).select(
         'firstName lastName email role ethereumAddress profilePicture'
       );
@@ -674,20 +713,6 @@ router.get('/user-profile', authenticateToken, async (req, res) => {
   }
 });
 
-
-router.get('/ethereum-address', authenticateToken, async (req, res) => {
-  try {
-    if (!req.ethereumAddress) {
-      console.error('Ethereum address not found in token');
-      return res.status(404).json({ message: 'Ethereum address not available' });
-    }
-
-    return res.status(200).json({ ethereumAddress: req.ethereumAddress });
-  } catch (error) {
-    console.error('Error fetching Ethereum address:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-});
 
 
 const handleLogout = async () => {

@@ -82,6 +82,7 @@ const InstituteDashboard = () => {
     { id: 'pendingApprovals', icon: <FaUserClock />, label: 'Pending Approvals' },
     { id: 'profile', icon: <FaExchangeAlt />, label: 'Profile Management' },
     { id: 'Logout', icon: <FiLogOut />, label: 'Logout', action: handleLogout },
+    
   ];
 
   const renderContent = () => {

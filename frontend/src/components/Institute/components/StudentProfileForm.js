@@ -180,7 +180,7 @@ const StudentProfileForm = ({ initialData = null, onSubmit }) => {
               <option value="">Select School</option>
               <option value="business">School of Business</option>
               <option value="social_sciences">School of Social Sciences</option>
-              <option value="computing">School of Computing</option>
+              <option value="computing">School of Computing, Technology and Applied Science (SOCTAZ) </option>
               <option value="law">School of Law</option>
             </select>
           </div>
