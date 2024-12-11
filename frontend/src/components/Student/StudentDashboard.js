@@ -28,8 +28,8 @@ const StudentDashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
 
-  const contractAddress = "0xA39e30e17F63F8b6AD4CE2ddcfb76fC36FE2444f";
-  const instituteAddress = "0x6dc1a3e5cED96bd6E53C03669E2c3119B129Ac1B";
+  const contractAddress = "0x7ac4910b25B8C2C5805C25f5f365a1038353f678";
+  const instituteAddress = "0x53d02c6528d4849841146D8b162306Ce47E1c74a";
 
   const handleLogout = () => {
     console.log("Logging out...");

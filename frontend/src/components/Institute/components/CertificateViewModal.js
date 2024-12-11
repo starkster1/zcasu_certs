@@ -4,12 +4,13 @@ import styles from "./CertificateViewModal.module.css";
 import { useBlockchain } from "../../../hooks/useBlockchain";
 import { toast } from "react-toastify";
 
-const CertificateViewModal = ({ request, onClose, }) => {
+const CertificateViewModal = ({ request, onClose, onActionComplete }) => {
   const [decryptedFileUrl, setDecryptedFileUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { verifyCertificate, revokeCertificate } = useBlockchain();
   const [isProcessing, setIsProcessing] = useState(false);
+  
 
   useEffect(() => {
     const decryptFile = async () => {
@@ -52,18 +53,44 @@ const CertificateViewModal = ({ request, onClose, }) => {
     decryptFile();
   }, [request]);
 
+  const updateDatabase = async (action) => {
+    // Map frontend actions to backend schema enum values
+    const validStatus = action === "approved" ? "Verified" : "Revoked";
+  
+    const response = await fetch("http://localhost:5000/api/update-request-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+      body: JSON.stringify({ requestId: request._id, status: validStatus }),
+    });
+  
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update status in the database.");
+    }
+  
+    return data;
+  };
+  
   const handleApprove = async () => {
     try {
       setIsProcessing(true);
       toast.info("Approving certificate... Please wait.");
-      const success = await verifyCertificate(request.ipfsHash, true);
-
-      if (success) {
-        toast.success("Certificate successfully verified!");
-        onClose();
-      } else {
-        throw new Error("Transaction failed.");
+  
+      // Interact with the blockchain
+      const blockchainSuccess = await verifyCertificate(request.ipfsHash, true);
+      if (!blockchainSuccess) {
+        throw new Error("Blockchain transaction for approval failed.");
       }
+  
+      // Update the database
+      await updateDatabase("approved"); // Sends "Verified" to the backend
+  
+      toast.success("Certificate successfully approved!");
+      onActionComplete({ ...request, status: "Verified" }); // Notify parent
+      onClose();
     } catch (error) {
       console.error("Error approving certificate:", error);
       toast.error(error.message || "Failed to approve certificate.");
@@ -71,26 +98,34 @@ const CertificateViewModal = ({ request, onClose, }) => {
       setIsProcessing(false);
     }
   };
-
+  
   const handleReject = async () => {
     try {
       setIsProcessing(true);
       toast.info("Revoking certificate... Please wait.");
-      const success = await revokeCertificate(request.ipfsHash);
-
-      if (success) {
-        toast.success("Certificate successfully revoked!");
-        onClose();
-      } else {
-        throw new Error("Transaction failed.");
+  
+      // Interact with the blockchain
+      const blockchainSuccess = await revokeCertificate(request.ipfsHash);
+      if (!blockchainSuccess) {
+        throw new Error("Blockchain transaction for rejection failed.");
       }
+  
+      // Update the database
+      await updateDatabase("rejected"); // Sends "Revoked" to the backend
+  
+      toast.success("Certificate successfully revoked!");
+      onActionComplete({ ...request, status: "Revoked" }); // Notify parent
+      onClose();
     } catch (error) {
       console.error("Error rejecting certificate:", error);
-      toast.error(error.message || "Failed to revoke certificate.");
+      toast.error(error.message || "Failed to reject certificate.");
     } finally {
       setIsProcessing(false);
     }
   };
+  
+
+
 
   return (
     <div className={styles.modalBackdrop}>

@@ -330,7 +330,7 @@ const contractABI = [
     "type": "function"
   }
 ];
-const contractAddress = '0xA39e30e17F63F8b6AD4CE2ddcfb76fC36FE2444f'; // Replace with your contract address
+const contractAddress = '0x7ac4910b25B8C2C5805C25f5f365a1038353f678'; // Replace with your contract address
 
 // MetaMask verification utility function for admin
 const checkMetaMaskAdmin = async (ethAddress) => {
