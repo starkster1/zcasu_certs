@@ -33,7 +33,7 @@ Degree Project
 - Front-end of our Web-App is made with [React.Js](https://github.com/facebook/create-react-app) and our complete frontend and backend components are available at   
 - All User-Data is stored on [IPFS](https://ipfs.io/) also every data is first encryted locally and then send to ipfs to have more security
 <p align="center">
- <img height=350px  src="./frontend/src/assets/IPFS.PNG" >
+ <img height=350px  src="./frontend/src/assets/IPFS.png" >
 </p>
 
 - All user personal data is stored in mongoDB
