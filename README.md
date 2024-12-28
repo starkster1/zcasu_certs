@@ -45,7 +45,7 @@ Degree Project
 ### Login
 - There are two ways to login
   - Login as `Student`
-  - Login as `Institute`
+  - Login as `Institute`, which in this case is ZCAS University
   
 <p align="center">
  <img height=350px  src="./frontend/src/assets/Picture3.png" >
@@ -71,6 +71,8 @@ Degree Project
  - `Dashboard`
    - This is rendered screen after successful authentication and login by the user( Student). The dashaboard displays some tools and relevant information for the user.
      
+ - `Profile`
+   - This section displays the personal information of the user and other addtional information about the progran taken.
  - `My Documents`
    - Students can upload their Certificates themselves but these certificates need to be verified by Institute side ,only then                 certificates will appear in my documents section.
  
@@ -111,11 +113,12 @@ Degree Project
    - This section allows the admin to manage the users and information stored in the MongoDB.    
 ## Installation 
 
-### For Development
+### For Local Development
+ - You need to have Local ganache installed and setup. If not can use ganache cli on your favourite IDE. 
  - We are using Truffle for testing and development of this project.
- - Also you need to have Metamask Browser Extension and mongoDB set up.
+ - Also you need to have Metamask Browser Extension. 
  - For setting up Truffle (more detailed instruction are avalaible )  
- - Steps :
+ - `Steps `:
    - Clone the repo 
    > $ git clone https://github.com/starkster1/zcasu_certs.git
    - Setup Truffle
@@ -130,8 +133,8 @@ Degree Project
      - Compile and migrate the smart contracts( while in the smart-contracts directory).
      > $ npm compile
      
-     > $ npm migrate
-     
+     > $ npm migrate --network development ( if using a different network, specify in the command)
+     -after a successful migration, copy the contact address and the institute address in the terminal.
      - Update the .env with the relavant information such as the Institute Address and the Contract Address collected from the terminal output.
      - Next we move to the backend directory. In this directory we run the backend server.
      > $ node index.js 
@@ -152,6 +155,4 @@ Degree Project
   - We're are open to enhancements & bug-fixes.
   - Feel free to add issues and submit patches.
   ## Authors
-  - Jones Mukelabai
-## License
-This project is licensed under the MIT 
+  - Jones Mukelabai - mukelabaijones@gmail.com
